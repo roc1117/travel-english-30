@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>여행영어 30일</title>
+<meta name="description" content="공항부터 작별 인사까지 30일 180문장 여행영어. 차에서 듣는 드라이브 모드 포함.">
+<meta name="theme-color" content="#F1F3F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A0F1A" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="여행영어">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* Layout: one phone-width column — a boarding-pass card for the day, a departure-board course list, a fixed bottom tab bar; drive mode is a full-screen night-dark overlay */
+:root{
+  --bg:#F1F3F7;
+  --surface:#FFFFFF;
+  --surface-2:#E6EAF1;
+  --fg:#0F1A2B;
+  --muted:#566275;
+  --line:#D0D7E1;
+  --accent:#F2B70D;
+  --on-accent:#0F1A2B;
+  --accent-text:#8A6200;
+  --mark:rgba(242,183,13,.42);
+  --ok:#1C7A52;
+  --ok-bg:rgba(28,122,82,.11);
+  --warn-bg:rgba(242,183,13,.18);
+  --shadow:0 1px 2px rgba(15,26,43,.05),0 6px 20px rgba(15,26,43,.06);
+  --car-bg:#05080F;
+  --car-fg:#F3F5F9;
+  --car-muted:#8B96A9;
+  --car-line:#1F2939;
+  --car-btn:#0F1624;
+  --car-accent:#F5C21B;
+  --display:"Do Hyeon","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:14px;
+  --tabh:62px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A0F1A; --surface:#121A29; --surface-2:#1A2335; --fg:#E6EBF3; --muted:#97A3B6; --line:#243049;
+    --accent:#F5C21B; --on-accent:#0A0F1A; --accent-text:#F5C93A; --mark:rgba(245,194,27,.28);
+    --ok:#4CC38A; --ok-bg:rgba(76,195,138,.14); --warn-bg:rgba(245,194,27,.12); --shadow:none;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A0F1A; --surface:#121A29; --surface-2:#1A2335; --fg:#E6EBF3; --muted:#97A3B6; --line:#243049;
+  --accent:#F5C21B; --on-accent:#0A0F1A; --accent-text:#F5C93A; --mark:rgba(245,194,27,.28);
+  --ok:#4CC38A; --ok-bg:rgba(76,195,138,.14); --warn-bg:rgba(245,194,27,.12); --shadow:none;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+.topline{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.install{flex:none;margin-top:-4px}
+html,body{background:var(--bg)}
+body{color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+html.car-open,html.car-open body{overflow:hidden}
+p{margin:0}
+h1,h2,h3{margin:0;text-wrap:balance}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}
+
+.app{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:calc(env(safe-area-inset-top,0px) + 22px) calc(var(--tabh) + 40px + env(safe-area-inset-bottom,0px))}
+.eyebrow,.lbl{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:400;font-size:34px;line-height:1.15;margin-top:4px}
+h2{font-size:18px;font-weight:600;line-height:1.3}
+.lede{margin-top:8px;color:var(--muted);font-size:15px;max-width:34em}
+
+/* today header */
+.stats{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:10px;font-size:14px;color:var(--muted)}
+.stats b{color:var(--fg);font-weight:600;font-variant-numeric:tabular-nums}
+.track{display:grid;grid-template-columns:repeat(30,1fr);gap:3px;margin-top:12px}
+.track i{height:6px;border-radius:2px;background:var(--surface-2)}
+.track i.done{background:var(--fg)}
+.track i.cur{background:var(--accent)}
+
+/* boarding pass */
+.pass{margin-top:22px;display:grid;grid-template-columns:minmax(0,1fr) 88px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.pass-main{padding:18px;min-width:0}
+.pass-head{display:flex;align-items:flex-end;gap:12px}
+.dnum{font-family:var(--mono);font-size:50px;line-height:.9;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.zone{font-size:13px;font-weight:500;background:var(--surface-2);border-radius:6px;padding:2px 8px;margin-bottom:4px}
+.pass-title{font-family:var(--display);font-weight:400;font-size:27px;line-height:1.2;margin-top:14px}
+.pass-sub{color:var(--muted);font-size:14px;margin-top:2px}
+.pass-actions{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.pass-stub{position:relative;border-left:2px dashed var(--line);padding:18px 10px 18px 12px;display:flex;flex-direction:column;gap:2px}
+.pass-stub::before,.pass-stub::after{content:"";position:absolute;left:-10px;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1px solid var(--line)}
+.pass-stub::before{top:-10px}
+.pass-stub::after{bottom:-10px}
+.gate{font-family:var(--mono);font-size:22px;font-weight:500;letter-spacing:.04em;margin-bottom:12px}
+.st{font-size:13px;font-weight:600}
+.st.ok{color:var(--ok)}
+.daynav{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+.daynav .btn{font-family:var(--mono);font-size:13px}
+
+/* buttons */
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--fg);font-size:15px;font-weight:500;padding:9px 14px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;min-height:44px;line-height:1.2}
+.btn svg{flex:none}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:transparent;font-weight:600}
+.btn.ghost{background:transparent}
+.btn.sm{font-size:14px;padding:6px 12px;min-height:36px}
+.btn.wide{width:100%}
+.btn.big{min-height:56px;font-size:17px}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+.btn.playing{background:var(--surface-2);border-color:var(--accent)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+
+/* sentence list */
+.listbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:30px}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);cursor:pointer}
+.sw{appearance:none;-webkit-appearance:none;margin:0;width:44px;height:26px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);position:relative;cursor:pointer;flex:none;transition:background .15s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.sw:checked{background:var(--fg);border-color:var(--fg)}
+.sw:checked::after{transform:translateX(18px)}
+.sents{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.sent{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px 14px 16px;min-width:0}
+.sent.them{background:transparent;border-style:dashed}
+.sent-top{display:flex;align-items:center;gap:8px;min-height:36px}
+.sid{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.role{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--surface-2)}
+.them .role{background:transparent;border:1px solid var(--line);color:var(--accent-text)}
+.star{margin-left:auto;width:40px;height:40px;margin-right:-8px;display:grid;place-items:center;border:0;background:transparent;color:var(--muted);border-radius:10px;cursor:pointer}
+.star.on{color:var(--accent-text)}
+.star.on path{fill:currentColor}
+.ko{margin-top:4px;font-size:15px;color:var(--muted)}
+.en{margin-top:2px;font-size:19px;line-height:1.42;font-weight:500;overflow-wrap:anywhere}
+mark{background:linear-gradient(transparent 56%,var(--mark) 56%);color:inherit;padding:0 1px}
+.tip{margin-top:8px;font-size:13px;color:var(--muted)}
+.tip .lbl{margin-right:8px;font-size:10px}
+.reveal{margin-top:6px;width:100%;text-align:left;border:1px dashed var(--line);background:transparent;color:var(--muted);border-radius:10px;padding:10px 12px;font-size:15px;cursor:pointer}
+.sent-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.sent-act .dayref{margin-left:auto}
+.finish{margin-top:22px}
+.finish.done{background:var(--ok-bg);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px}
+.finish.done p{color:var(--ok);font-weight:600}
+
+/* course board */
+.searchbox{margin-top:18px}
+.searchbox input{width:100%;height:48px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:0 14px;font:inherit;font-size:16px}
+.searchbox input::placeholder{color:var(--muted)}
+.phase{margin-top:26px}
+.phase-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.board{list-style:none;padding:0;margin:8px 0 0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.brow{width:100%;display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 14px;background:transparent;border:0;border-top:1px solid var(--line);text-align:left;cursor:pointer}
+.board li:first-child .brow{border-top:0}
+.bday{font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bt b{display:block;font-weight:600;font-size:15px;line-height:1.35}
+.bt small{color:var(--muted);font-size:13px}
+.chip{font-size:12px;padding:3px 8px;border-radius:6px;font-weight:600;white-space:nowrap}
+.chip.ok{background:var(--ok-bg);color:var(--ok)}
+.chip.next{background:var(--accent);color:var(--on-accent)}
+.chip.plan{color:var(--muted);border:1px solid var(--line);font-weight:500}
+.count{margin-top:16px;font-size:13px;color:var(--muted)}
+.empty-line{margin-top:18px;color:var(--muted);font-size:15px}
+
+/* drive setup */
+.group{margin-top:22px}
+.glabel{margin-bottom:8px;font-size:13px;font-weight:600;color:var(--muted)}
+.ranges{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.range{text-align:left;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;min-width:0}
+.range b{display:block;font-size:15px;font-weight:600}
+.range small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.range[aria-pressed="true"]{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}
+.range:disabled{opacity:.42;cursor:not-allowed}
+.seg{display:flex;background:var(--surface-2);border-radius:11px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;padding:8px 4px;border-radius:8px;font-size:14px;color:var(--muted);cursor:pointer;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);font-weight:600;box-shadow:var(--shadow)}
+.toggles{border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.tg{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border-top:1px solid var(--line);font-size:15px;cursor:pointer}
+.tg:first-child{border-top:0}
+.start{margin-top:26px}
+.notes{margin-top:18px;padding:14px 16px 14px 34px;border-radius:12px;background:var(--surface-2);font-size:14px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.warn{margin-top:16px;background:var(--warn-bg);padding:12px 14px;border-radius:12px;font-size:14px}
+
+/* review */
+.empty{margin-top:20px;border:1px dashed var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.empty-t{font-weight:600}
+.empty p:not(.empty-t){color:var(--muted);font-size:14px;margin-bottom:8px}
+
+/* tab bar */
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabbar-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.tabbar button{position:relative;height:var(--tabh);background:transparent;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:12px;cursor:pointer}
+.tabbar button.on{color:var(--fg);font-weight:600}
+.tabbar button.on::before{content:"";position:absolute;top:0;left:50%;width:28px;height:3px;margin-left:-14px;border-radius:0 0 3px 3px;background:var(--accent)}
+.tabbar svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabh) + 16px + env(safe-area-inset-bottom,0px));z-index:40;background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;max-width:calc(100% - 32px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+
+/* drive overlay — always night-dark, on purpose */
+.car{position:fixed;inset:0;z-index:50;background:var(--car-bg);color:var(--car-fg);display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 14px) 18px calc(env(safe-area-inset-bottom,0px) + 16px);color-scheme:dark}
+.car-in{width:100%;max-width:720px;margin:0 auto;flex:1;display:flex;flex-direction:column;min-height:0}
+.car-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.car .lbl{color:var(--car-muted)}
+.car-label{font-size:15px;font-weight:500;margin-top:2px}
+.car-close{background:transparent;color:var(--car-fg);border:1px solid var(--car-line);border-radius:10px;padding:8px 16px;min-height:44px;cursor:pointer;flex:none}
+.car-mid{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;min-height:0;overflow-y:auto;padding-block:16px}
+.car-meta{font-family:var(--mono);font-size:13px;color:var(--car-muted);letter-spacing:.04em}
+.car-ko{font-size:clamp(22px,6vw,32px);line-height:1.4;font-weight:500}
+.car-en{font-size:clamp(26px,7.4vw,42px);line-height:1.25;font-weight:600;color:var(--car-accent);letter-spacing:-.01em;overflow-wrap:anywhere}
+.car-en mark{background:none;color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px}
+.veil{opacity:.3}
+.car-stage{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.stage-l{font-size:17px;min-height:1.5em}
+.bar{height:6px;background:var(--car-line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--car-accent)}
+.car-count{font-family:var(--mono);font-size:14px;color:var(--car-muted);margin-bottom:10px;font-variant-numeric:tabular-nums}
+.car-ctl{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:10px}
+.car-ctl button{min-height:78px;border-radius:16px;border:1px solid var(--car-line);background:var(--car-btn);color:var(--car-fg);display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px;cursor:pointer}
+.car-ctl button svg{width:26px;height:26px}
+.car-ctl .play{background:var(--car-accent);color:var(--car-bg);border-color:transparent;font-weight:600;font-size:16px}
+.car-foot{font-size:13px;color:var(--car-muted);margin-top:12px;text-align:center}
+
+@media (max-width:380px){
+  h1{font-size:30px}
+  .dnum{font-size:44px}
+  .pass{grid-template-columns:minmax(0,1fr) 78px}
+  .ranges{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="app"><main id="view"></main></div>
+
+<nav class="tabbar" aria-label="메뉴">
+  <div class="tabbar-in">
+    <button data-tab="today"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>오늘</span></button>
+    <button data-tab="drive"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.2"/><path d="M3.8 10.5h6.1M14.1 10.5h6.1M12 14.2v6.1"/></svg><span>드라이브</span></button>
+    <button data-tab="course"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg><span>과정</span></button>
+    <button data-tab="saved"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 4h11v16l-5.5-3.8L6.5 20z"/></svg><span>복습</span></button>
+  </div>
+</nav>
+
+<div id="toast" class="toast" role="status" hidden></div>
+
+<div id="car" class="car" hidden role="dialog" aria-modal="true" aria-label="드라이브 모드">
+  <div class="car-in">
+    <div class="car-top">
+      <div><p class="lbl">Drive mode</p><p id="carLabel" class="car-label"></p></div>
+      <button class="car-close" data-car="close">닫기</button>
+    </div>
+    <div class="car-mid">
+      <p class="car-meta"><span id="carDay"></span> · <span id="carRole"></span></p>
+      <p id="carKo" class="car-ko"></p>
+      <p id="carEn" class="car-en" lang="en"></p>
+      <div class="car-stage"><p id="carStage" class="stage-l">&nbsp;</p><div class="bar"><i id="carBar"></i></div></div>
+    </div>
+    <p id="carCount" class="car-count"></p>
+    <div class="car-ctl">
+      <button data-car="prev" aria-label="이전 문장"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2.2v14H6zM19 5v14L9.2 12z" fill="currentColor"/></svg><span>이전</span></button>
+      <button data-car="toggle" id="carPlay" class="play" aria-label="재생"></button>
+      <button data-car="next" aria-label="다음 문장"><span>다음</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.8 5H18v14h-2.2zM5 5v14l9.8-7z" fill="currentColor"/></svg></button>
+    </div>
+    <p id="carWake" class="car-foot"></p>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ───────── 30일 과정 데이터 ───────── */
+const PH={AIR:"공항·비행",HTL:"숙소",MOVE:"이동",FOOD:"식사",TOUR:"쇼핑·관광",HELP:"위급 상황",TALK:"대화"};
+const PH_ORDER=["AIR","HTL","MOVE","FOOD","TOUR","HELP","TALK"];
+/* 문장: [역할 m=내가 말하기 / t=듣게 될 말, 영어([ ]=핵심 패턴), 한국어, 팁] */
+const D=[
+{t:"공항 체크인",e:"Airport check-in",c:"CHK",p:"AIR",s:[
+["m","I'd like to [check in for] my flight to London.","런던행 비행기 체크인하려고 합니다.","check in for + 항공편: ~편 체크인하다"],
+["t","May I see your passport, please?","여권 좀 보여 주시겠어요?",""],
+["m","[Could I get] an aisle seat?","통로 쪽 좌석으로 받을 수 있을까요?","창가석은 window seat"],
+["t","How many bags are you checking in?","부치실 짐이 몇 개인가요?","check in a bag: 짐을 부치다"],
+["m","[Just one], and this one is a carry-on.","하나만 부칠게요. 이건 기내용이에요.","carry-on: 기내 반입 가방"],
+["m","[Is the flight on time]?","비행기 제시간에 출발하나요?","on time 정시 / delayed 지연"]]},
+{t:"보안검색·탑승구",e:"Security & gate",c:"SEC",p:"AIR",s:[
+["t","Please take your laptop out of the bag.","노트북은 가방에서 꺼내 주세요.",""],
+["m","[Do I need to take off] my shoes?","신발도 벗어야 하나요?","Do I need to ~?: ~해야 하나요?"],
+["t","Do you have any liquids in your bag?","가방에 액체류 있으세요?",""],
+["m","[Where is] Gate 23?","23번 게이트가 어디예요?",""],
+["m","[Has boarding started] for this flight?","이 비행기 탑승 시작했나요?",""],
+["m","[Is this the line for] Group 3?","3번 그룹 줄이 여기인가요?","line: 줄 (영국은 queue)"]]},
+{t:"기내에서",e:"On board",c:"CAB",p:"AIR",s:[
+["m","[Could I have] some water, please?","물 좀 주시겠어요?","Could I have ~?: 가장 무난한 요청"],
+["t","Would you like chicken or beef?","닭고기와 소고기 중 어떤 걸로 드릴까요?",""],
+["m","[I'll have] the beef, please.","소고기로 할게요.","I'll have ~: 주문할 때 기본형"],
+["m","[Would you mind if I] put my seat back?","의자를 좀 뒤로 젖혀도 될까요?","Would you mind if I ~?: ~해도 괜찮을까요?"],
+["m","[Could you help me] put this bag up?","이 가방 올리는 것 좀 도와주시겠어요?",""],
+["m","[Can I get] an extra blanket?","담요 하나 더 받을 수 있을까요?",""]]},
+{t:"입국심사",e:"Immigration",c:"IMM",p:"AIR",s:[
+["t","What's the purpose of your visit?","방문 목적이 무엇인가요?",""],
+["m","[I'm here on] vacation.","휴가차 왔습니다.","출장이면 I'm here on business."],
+["t","How long will you be staying?","얼마나 머무르실 건가요?",""],
+["m","[I'm staying for] ten days.","열흘 동안 있을 예정입니다.",""],
+["m","[I'm staying at] the Hilton downtown.","시내 힐튼 호텔에 묵습니다.",""],
+["m","[Here's my] return ticket.","여기 귀국 항공권입니다.","Here's my ~: 서류를 건넬 때"]]},
+{t:"수하물·세관",e:"Baggage & customs",c:"BAG",p:"AIR",s:[
+["m","[Where can I pick up] my baggage?","짐은 어디서 찾나요?","baggage claim: 수하물 찾는 곳"],
+["m","[My bag hasn't come out] yet.","제 가방이 아직 안 나왔어요.",""],
+["m","[I'd like to report] a missing bag.","가방 분실 신고를 하려고 합니다.",""],
+["t","Can you describe your bag?","가방이 어떻게 생겼는지 말씀해 주시겠어요?",""],
+["m","[It's a] black suitcase [with] a red tag.","빨간 태그가 달린 검은색 캐리어예요.","It's a + 색 + 물건 + with ~"],
+["t","Do you have anything to declare?","신고할 물품 있으세요?","declare: 세관에 신고하다"]]},
+{t:"환승·지연",e:"Transfers & delays",c:"TRF",p:"AIR",s:[
+["m","[I have a connecting flight] to Paris.","파리로 가는 환승편이 있어요.",""],
+["m","[Where do I go for] transfers?","환승하려면 어디로 가야 하나요?",""],
+["m","[I missed my] connecting flight.","환승 비행기를 놓쳤어요.",""],
+["t","We can put you on the next flight.","다음 항공편으로 바꿔 드릴게요.",""],
+["m","[What time does] the next flight leave?","다음 비행기는 몇 시에 출발하나요?",""],
+["m","[Can I get] a meal voucher?","식사 쿠폰을 받을 수 있나요?","오래 지연될 때 항공사에 요청해 볼 수 있어요"]]},
+{t:"호텔 체크인",e:"Hotel check-in",c:"HTL",p:"HTL",s:[
+["m","[I have a reservation under] Kim.","김 이름으로 예약했습니다.","under + 이름: ~ 이름으로"],
+["t","Can I have a credit card for incidentals?","부대비용 보증용 신용카드 주시겠어요?","incidentals: 부대비용(보증금)"],
+["m","[Is breakfast included]?","조식 포함인가요?",""],
+["m","[What time is] check-out?","체크아웃은 몇 시인가요?",""],
+["m","[What's the] Wi-Fi password?","와이파이 비밀번호가 뭔가요?",""],
+["m","[Could I check in early]?","일찍 체크인할 수 있을까요?","늦게 나가려면 late check-out"]]},
+{t:"객실 요청",e:"Room requests",c:"REQ",p:"HTL",s:[
+["m","[Could I get] a room on a higher floor?","더 높은 층 방으로 받을 수 있을까요?",""],
+["m","[Could you send up] two more towels?","수건 두 장 더 올려 주시겠어요?","send up: 객실로 올려 보내다"],
+["m","[Could I get] a wake-up call at six?","6시에 모닝콜 부탁드려도 될까요?","모닝콜은 wake-up call"],
+["m","[Could you hold my luggage] until 3 p.m.?","오후 3시까지 짐 좀 맡아 주실 수 있나요?",""],
+["t","Would you like your room cleaned today?","오늘 객실 청소해 드릴까요?",""],
+["m","[Is there] a gym in the hotel?","호텔에 피트니스 센터가 있나요?","Is there ~?: ~이 있나요?"]]},
+{t:"객실 문제 해결",e:"Room problems",c:"FIX",p:"HTL",s:[
+["m","[The air conditioner isn't working].","에어컨이 작동하지 않아요.","~ isn't working: 고장 났을 때"],
+["m","[There's no hot water] in my room.","방에 온수가 안 나와요.",""],
+["m","[I locked myself out of] my room.","키를 두고 나와서 방에 못 들어가요.",""],
+["m","[The room next door is] really noisy.","옆방이 너무 시끄러워요.",""],
+["m","[Would it be possible to] change rooms?","방을 바꿀 수 있을까요?","Would it be possible to ~?: 정중한 요청"],
+["t","I'll send someone up right away.","바로 직원을 올려 보내겠습니다.",""]]},
+{t:"체크아웃",e:"Check-out",c:"OUT",p:"HTL",s:[
+["m","[I'd like to check out], please.","체크아웃할게요.",""],
+["t","Did you have anything from the minibar?","미니바 이용하신 것 있으세요?",""],
+["m","[I didn't use] the minibar.","미니바는 이용하지 않았어요.",""],
+["m","[I think there's a mistake] on my bill.","계산서에 착오가 있는 것 같아요.","I think ~: 단정을 피하는 부드러운 표현"],
+["m","[Could you call a taxi] for me?","택시 좀 불러 주시겠어요?",""],
+["m","[Could I get] a receipt?","영수증 받을 수 있을까요?",""]]},
+{t:"택시·차량 호출",e:"Taxis & rides",c:"TXI",p:"MOVE",s:[
+["t","Where are you headed?","어디로 가세요?",""],
+["m","[Could you take me to] this address?","이 주소로 가 주시겠어요?","휴대폰 화면을 보여 주며 쓰기 좋은 문장"],
+["m","[How long does it take to] get to the airport?","공항까지 얼마나 걸리나요?",""],
+["m","[About how much is it to] downtown?","시내까지 대략 얼마 나오나요?",""],
+["m","[Could you pull over] here?","여기서 세워 주시겠어요?","pull over: 차를 길가에 세우다"],
+["m","[Keep the change].","잔돈은 가지세요.",""]]},
+{t:"지하철·버스",e:"Subway & bus",c:"MTR",p:"MOVE",s:[
+["m","[Which line goes to] the museum?","박물관에 가려면 몇 호선을 타야 하나요?",""],
+["m","[Where can I buy] a ticket?","표는 어디서 사나요?",""],
+["m","[Does this bus go to] Central Station?","이 버스 중앙역에 가나요?",""],
+["m","[Which stop do I get off at] for the market?","시장에 가려면 어느 정류장에서 내리나요?","get off: 내리다 / get on: 타다"],
+["m","[Can I pay with] a contactless card?","컨택리스(비접촉) 카드로 탈 수 있나요?",""],
+["t","You need to transfer at the next station.","다음 역에서 갈아타셔야 해요.",""]]},
+{t:"기차표",e:"Trains",c:"RLY",p:"MOVE",s:[
+["m","[A round-trip ticket to] Oxford, please.","옥스퍼드 왕복표 한 장 주세요.","편도는 one-way"],
+["m","[When's the next train to] Oxford?","옥스퍼드행 다음 기차는 언제예요?",""],
+["m","[Which platform does it leave from]?","몇 번 승강장에서 출발하나요?",""],
+["t","Do you have a seat reservation?","좌석 예약하셨어요?",""],
+["m","[Is this seat taken]?","이 자리 주인 있나요?","빈자리에 앉기 전에"],
+["m","[Do I need to change trains]?","기차를 갈아타야 하나요?",""]]},
+{t:"렌터카",e:"Car rental",c:"CAR",p:"MOVE",s:[
+["m","[I'm here to pick up] my rental car.","예약한 렌터카를 찾으러 왔어요.",""],
+["m","[Is insurance included]?","보험이 포함되어 있나요?",""],
+["t","Would you like full coverage?","완전 보장 보험으로 하시겠어요?","full coverage: 종합 보험"],
+["m","[Do I need to return it with] a full tank?","기름을 가득 채워서 반납해야 하나요?",""],
+["m","[There's already a scratch] here.","여기 이미 긁힌 자국이 있어요.","출발 전에 사진과 함께 확인해 두세요"],
+["m","[Where's the nearest] gas station?","가장 가까운 주유소가 어디예요?","영국에서는 petrol station"]]},
+{t:"길 묻기",e:"Asking directions",c:"MAP",p:"MOVE",s:[
+["m","[Excuse me, how do I get to] City Hall?","실례합니다. 시청에 어떻게 가나요?",""],
+["m","[Is it within walking distance]?","걸어갈 수 있는 거리인가요?",""],
+["t","Go straight and turn left at the second light.","쭉 가다가 두 번째 신호등에서 왼쪽으로 도세요.",""],
+["m","[Could you show me] on the map?","지도에서 보여 주시겠어요?",""],
+["t","It's about a ten-minute walk.","걸어서 10분쯤 걸려요.",""],
+["m","[I think I'm lost].","길을 잃은 것 같아요.",""]]},
+{t:"식당 예약·입장",e:"Reservations",c:"RSV",p:"FOOD",s:[
+["m","[I'd like to book a table for] two at 7 p.m.","저녁 7시에 두 명 예약하고 싶어요.","book a table: 식당을 예약하다"],
+["t","Do you have a reservation?","예약하셨어요?",""],
+["m","[Do you have a table for] four?","네 명 앉을 자리 있나요?",""],
+["t","It'll be about a twenty-minute wait.","20분 정도 기다리셔야 해요.",""],
+["m","[Could we sit] by the window?","창가 자리에 앉을 수 있을까요?",""],
+["m","[Can we sit] outside?","바깥 자리에 앉아도 되나요?",""]]},
+{t:"주문하기",e:"Ordering",c:"ORD",p:"FOOD",s:[
+["m","[Could we see the menu], please?","메뉴판 좀 볼 수 있을까요?",""],
+["m","[What do you recommend]?","추천해 주실 만한 메뉴가 있나요?",""],
+["t","How would you like your steak?","스테이크 굽기는 어떻게 해 드릴까요?",""],
+["m","[I'll have] the steak, medium-rare.","스테이크로 할게요. 미디엄 레어로요.",""],
+["m","[Is this] spicy?","이거 매운가요?",""],
+["m","[Could I get it without] onions?","양파는 빼 주실 수 있나요?","without ~: ~ 빼고"]]},
+{t:"식사 중 요청",e:"During the meal",c:"TBL",p:"FOOD",s:[
+["t","How is everything?","식사는 괜찮으세요?",""],
+["m","[Everything is great], thank you.","다 맛있어요. 감사합니다.",""],
+["m","[Could we get] some more bread?","빵 좀 더 주실 수 있나요?",""],
+["m","[I don't think this is] what I ordered.","제가 주문한 게 아닌 것 같아요.","I don't think ~: 부드럽게 지적하기"],
+["m","[Could I get] a box for this?","남은 건 포장해 갈 수 있을까요?","box: 남은 음식 포장 용기"],
+["m","[Could you warm this up]? It's a bit cold.","이것 좀 데워 주시겠어요? 조금 식었어요.",""]]},
+{t:"계산·팁",e:"Paying the bill",c:"PAY",p:"FOOD",s:[
+["m","[Could we get the check], please?","계산서 주시겠어요?","영국에서는 the bill"],
+["m","[Can we pay separately]?","따로 계산할 수 있나요?",""],
+["m","[Is service included]?","봉사료가 포함되어 있나요?",""],
+["t","Would you like to add a tip?","팁을 추가하시겠어요?",""],
+["m","[I'll pay by] card.","카드로 계산할게요.","현금은 in cash"],
+["m","[I think I was charged] twice.","결제가 두 번 된 것 같아요.",""]]},
+{t:"카페",e:"Café",c:"CAF",p:"FOOD",s:[
+["m","[Can I get] a large iced Americano?","아이스 아메리카노 큰 사이즈로 주세요.",""],
+["t","For here or to go?","드시고 가세요, 가져가세요?",""],
+["m","[To go], please.","가져갈게요.","매장에서 먹으면 For here"],
+["m","[Could I have] oat milk instead?","우유 대신 귀리 우유로 바꿀 수 있나요?","instead: 대신에"],
+["t","Can I get a name for the order?","주문하시는 분 성함이 어떻게 되세요?",""],
+["m","[Where's the restroom]?","화장실이 어디예요?","영국에서는 toilet"]]},
+{t:"쇼핑",e:"Shopping",c:"SHP",p:"TOUR",s:[
+["t","Can I help you find anything?","찾으시는 거 있으면 도와드릴까요?",""],
+["m","[I'm just looking], thanks.","그냥 둘러보는 중이에요. 감사합니다.",""],
+["m","[Do you have this in] a medium?","이거 미디엄 사이즈 있나요?","Do you have this in + 사이즈/색"],
+["m","[Can I try this on]?","이거 입어 봐도 되나요?","try on: 입어(신어) 보다"],
+["m","[Do you have it in] another color?","다른 색상도 있나요?",""],
+["m","[It's a little] too tight.","조금 꽉 끼네요.","너무 크면 too loose"]]},
+{t:"결제·면세·환불",e:"Paying & returns",c:"RFD",p:"TOUR",s:[
+["m","[How much is] this?","이거 얼마예요?",""],
+["m","[Is there a discount if I] buy two?","두 개 사면 할인되나요?",""],
+["m","[Could I get] a tax refund form?","택스 리펀드 서류 받을 수 있을까요?",""],
+["m","[I'd like to return] this.","이거 반품하고 싶어요.",""],
+["t","Do you have the receipt?","영수증 가지고 계세요?",""],
+["m","[Could I exchange this for] a larger size?","더 큰 사이즈로 교환할 수 있을까요?","exchange A for B: A를 B로 교환"]]},
+{t:"관광지·입장권",e:"Tickets & sights",c:"TKT",p:"TOUR",s:[
+["m","[Two adult tickets], please.","성인 두 장 주세요.",""],
+["m","[What time do you close]?","몇 시에 문을 닫나요?",""],
+["m","[Do you have] an audio guide in Korean?","한국어 오디오 가이드 있나요?",""],
+["t","Large bags must be left at the cloakroom.","큰 가방은 물품 보관소에 맡기셔야 합니다.","cloakroom: 짐·외투 보관소"],
+["m","[Am I allowed to take pictures] inside?","안에서 사진 찍어도 되나요?","Am I allowed to ~?: ~해도 되나요?"],
+["m","[Is there a discount for] seniors?","경로 우대 할인이 있나요?",""]]},
+{t:"투어·사진 부탁",e:"Tours & photos",c:"TUR",p:"TOUR",s:[
+["m","[Could you take a picture of] us?","저희 사진 좀 찍어 주시겠어요?",""],
+["m","[Just press] this button.","이 버튼만 누르시면 돼요.",""],
+["m","[Could you take] one more?","한 장만 더 찍어 주시겠어요?",""],
+["m","[Where does the tour start]?","투어는 어디서 시작하나요?",""],
+["m","[How long is] the tour?","투어는 얼마나 걸리나요?",""],
+["t","Please be back here by three.","3시까지 여기로 돌아와 주세요.","by + 시각: ~까지"]]},
+{t:"환전·유심",e:"Money & phone",c:"EXC",p:"TOUR",s:[
+["m","[I'd like to exchange] won for euros.","원화를 유로로 바꾸고 싶어요.",""],
+["m","[What's the exchange rate] today?","오늘 환율이 어떻게 되나요?",""],
+["m","[Is there an ATM] near here?","근처에 ATM 있나요?",""],
+["t","Would you like to pay in euros or Korean won?","유로로 결제하시겠어요, 원화로 하시겠어요?","해외 카드 결제는 보통 현지 통화 선택이 유리해요"],
+["m","[I'd like a SIM card with] data for a week.","일주일 쓸 데이터 유심 주세요.",""],
+["m","[My phone won't connect] to the network.","휴대폰이 네트워크에 연결되지 않아요.","won't + 동사: 도무지 ~하지 않는다"]]},
+{t:"약국·병원",e:"Pharmacy & clinic",c:"MED",p:"HELP",s:[
+["m","[I have a] headache.","머리가 아파요.","I have a + 증상"],
+["m","[Do you have anything for] a cold?","감기약 있나요?",""],
+["t","How long have you had these symptoms?","이 증상은 언제부터 있었어요?",""],
+["m","[I'm allergic to] penicillin.","페니실린 알레르기가 있어요.",""],
+["m","[How often should I take] this?","이 약은 얼마나 자주 먹어야 하나요?",""],
+["m","[I need to see a doctor].","진료를 받아야 할 것 같아요.",""]]},
+{t:"분실·도난",e:"Lost & stolen",c:"LST",p:"HELP",s:[
+["m","[I lost my] passport.","여권을 잃어버렸어요.",""],
+["m","[My wallet was stolen].","지갑을 도난당했어요.",""],
+["t","When did you last have it?","마지막으로 갖고 계셨던 게 언제예요?",""],
+["m","[Where's the nearest] police station?","가장 가까운 경찰서가 어디예요?",""],
+["m","[I need a police report] for my insurance.","보험 청구용 경찰 확인서가 필요해요.","police report: 사건 신고 확인서"],
+["m","[I left my bag] in the taxi.","택시에 가방을 두고 내렸어요.","leave A in B: A를 B에 두고 오다"]]},
+{t:"긴급 상황",e:"Emergencies",c:"SOS",p:"HELP",s:[
+["m","[Please call] an ambulance!","구급차 불러 주세요!",""],
+["m","[I need help]!","도와주세요!",""],
+["t","Are you hurt?","다치셨어요?",""],
+["m","[I've been in] a car accident.","교통사고가 났어요.",""],
+["m","[Does anyone here speak] Korean?","여기 한국어 하시는 분 계신가요?",""],
+["m","[Please contact] the Korean Embassy.","한국 대사관에 연락해 주세요.","외교부 영사콜센터 +82-2-3210-0404"]]},
+{t:"스몰토크",e:"Small talk",c:"HEY",p:"TALK",s:[
+["t","Where are you from?","어디서 오셨어요?",""],
+["m","[I'm from] Seoul, South Korea.","한국 서울에서 왔어요.",""],
+["m","[This is my first time] in Spain.","스페인은 이번이 처음이에요.",""],
+["t","How do you like it so far?","지금까지 여기 어떠세요?",""],
+["m","[I love it]. The food is amazing.","정말 좋아요. 음식이 최고예요.",""],
+["m","[Any recommendations for] dinner around here?","이 근처에 저녁 먹을 만한 곳 추천해 주실래요?","Any recommendations for ~?: 짧고 편한 질문"]]},
+{t:"되묻기·감사·작별",e:"Clarify & goodbye",c:"BYE",p:"TALK",s:[
+["m","[Sorry, could you say that again]?","죄송한데 다시 한번 말씀해 주시겠어요?",""],
+["m","[Could you speak a little more slowly]?","조금만 천천히 말씀해 주시겠어요?",""],
+["m","[Could you write it down] for me?","적어 주실 수 있을까요?",""],
+["m","[Thank you so much for] your help.","도와주셔서 정말 감사합니다.",""],
+["m","[It was nice meeting you].","만나서 반가웠어요.",""],
+["m","[Have a great] trip!","즐거운 여행 되세요!","Have a great day / weekend / trip"]]}
+];
+
+const ALL=[];
+D.forEach((d,i)=>d.s.forEach((s,j)=>ALL.push({id:(i+1)+"-"+(j+1),day:i+1,n:j+1,role:s[0],en:s[1],ko:s[2],tip:s[3]||""})));
+const BY={}; ALL.forEach(s=>{BY[s.id]=s;});
+
+/* ───────── 상태 ───────── */
+const DEF_SET={rate:1,gap:"normal",order:"ko",slow:true,shuffle:false,loop:true,hide:false,range:"today"};
+const LS="travel-english-30.v1";
+function norm(o){
+  o=(o&&typeof o==="object")?o:{};
+  const done={};
+  if(o.done&&typeof o.done==="object"){for(const k in o.done){const n=+k;if(n>=1&&n<=30&&typeof o.done[k]==="string")done[n]=o.done[k];}}
+  const favs=Array.isArray(o.favs)?o.favs.filter(x=>typeof x==="string"&&BY[x]):[];
+  const set=Object.assign({},DEF_SET,(o.set&&typeof o.set==="object")?o.set:{});
+  return {done:done,favs:favs,set:set,at:+o.at||0};
+}
+function loadLocal(){try{const r=localStorage.getItem(LS);if(r)return norm(JSON.parse(r));}catch(e){}return norm({});}
+let S=loadLocal();
+function firstOpen(){for(let i=1;i<=30;i++){if(!S.done[i])return i;}return 30;}
+let sel=firstOpen(), selTouched=false, tab="today", query="", carOpen=false;
+const revealed=new Set();
+
+/* 저장: 이 휴대폰 */
+function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
+function commit(){S.at=Date.now();saveLocal();}
+
+/* 설치 */
+let installEvt=null;
+const standalone=()=>{try{return matchMedia("(display-mode: standalone)").matches;}catch(e){return false;}};
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;if(tab==="today")render();});
+window.addEventListener("appinstalled",()=>{installEvt=null;render();toast("홈 화면에 설치했어요.");});
+
+/* ───────── 유틸 ───────── */
+const $=s=>document.querySelector(s);
+const pad=n=>(n<10?"0":"")+n;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const plain=s=>s.replace(/[\[\]]/g,"");
+const hl=s=>esc(s).replace(/\[(.+?)\]/g,"<mark>$1</mark>");
+function ymd(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+const W=["일","월","화","수","목","금","토"];
+function todayLabel(){const d=new Date();return (d.getMonth()+1)+"월 "+d.getDate()+"일 "+W[d.getDay()]+"요일";}
+function fmtDate(s){const p=String(s).split("-");return p.length===3?(+p[1])+"월 "+(+p[2])+"일":s;}
+function streak(){
+  const days=new Set(Object.values(S.done));
+  const d=new Date(); let n=0;
+  if(!days.has(ymd(d)))d.setDate(d.getDate()-1);
+  while(days.has(ymd(d))){n++;d.setDate(d.getDate()-1);}
+  return n;
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+let toastT=null;
+function toast(msg){const t=$("#toast");t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true;},2800);}
+
+const ICON={
+  play:'<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>',
+  playL:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>',
+  pauseL:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.6v14H7zM13.4 5H17v14h-3.6z" fill="currentColor"/></svg>',
+  star:'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3.6l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>'
+};
+
+/* ───────── 음성 읽기 ───────── */
+const TTS={ok:("speechSynthesis" in window)&&typeof window.SpeechSynthesisUtterance!=="undefined",en:null,ko:null};
+function pickVoices(){
+  if(!TTS.ok)return;
+  let vs=[];try{vs=speechSynthesis.getVoices()||[];}catch(e){}
+  if(!vs.length)return;
+  const en=vs.filter(v=>/^en([-_]|$)/i.test(v.lang));
+  const pref=["Samantha","Google US English","Microsoft Aria","Microsoft Jenny","Alex","Karen","Daniel"];
+  TTS.en=pref.map(n=>en.find(v=>v.name.indexOf(n)===0)).find(Boolean)||en.find(v=>/en[-_]US/i.test(v.lang))||en[0]||null;
+  const ko=vs.filter(v=>/^ko/i.test(v.lang));
+  TTS.ko=ko.find(v=>/Yuna|Google/i.test(v.name))||ko[0]||null;
+}
+if(TTS.ok){pickVoices();try{speechSynthesis.addEventListener("voiceschanged",pickVoices);}catch(e){speechSynthesis.onvoiceschanged=pickVoices;}}
+function stopSpeech(){if(!TTS.ok)return;try{if(speechSynthesis.speaking||speechSynthesis.pending)speechSynthesis.cancel();}catch(e){}}
+function speak(text,lang,rate){
+  return new Promise(res=>{
+    if(!TTS.ok){res();return;}
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=lang==="ko"?"ko-KR":"en-US";
+    const v=lang==="ko"?TTS.ko:TTS.en; if(v)u.voice=v;
+    u.rate=rate||1; u.pitch=1;
+    let fin=false;
+    const done=()=>{if(fin)return;fin=true;clearTimeout(t);res();};
+    const t=setTimeout(done,2500+text.length*(lang==="ko"?260:110)/(rate||1));
+    u.onend=done; u.onerror=done;
+    speak.keep=u;
+    try{speechSynthesis.resume();speechSynthesis.speak(u);}catch(e){done();}
+  });
+}
+function sayOne(btn,id,rate){
+  const s=BY[id]; if(!s)return;
+  if(!TTS.ok){toast("이 기기에서는 음성 읽기를 지원하지 않아요.");return;}
+  document.querySelectorAll(".btn.playing").forEach(b=>b.classList.remove("playing"));
+  stopSpeech();
+  btn.classList.add("playing");
+  speak(plain(s.en),"en",rate).then(()=>btn.classList.remove("playing"));
+}
+
+/* ───────── 드라이브 모드 플레이어 ───────── */
+const P={list:[],i:0,playing:false,token:0,label:"",wake:null,show:{ko:true,en:true}};
+const GAP={short:.75,normal:1,long:1.45};
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function setStage(label,ms){
+  $("#carStage").textContent=label||" ";
+  const b=$("#carBar");
+  b.style.transition="none"; b.style.width="0%";
+  if(ms){void b.offsetWidth;b.style.transition="width "+ms+"ms linear";b.style.width="100%";}
+}
+function drawCar(){
+  const k=Math.min(P.i,P.list.length-1), s=P.list[k]; if(!s)return;
+  $("#carLabel").textContent=P.label;
+  $("#carCount").textContent=(k+1)+" / "+P.list.length;
+  $("#carDay").textContent="DAY "+pad(s.day)+" · "+D[s.day-1].t;
+  $("#carRole").textContent=s.role==="t"?"듣게 될 말":"내가 말하기";
+  const showKo=!P.playing||P.show.ko, showEn=!P.playing||P.show.en;
+  const ko=$("#carKo"), en=$("#carEn");
+  ko.textContent=showKo?s.ko:"· · ·"; ko.classList.toggle("veil",!showKo);
+  en.innerHTML=showEn?hl(s.en):"· · ·"; en.classList.toggle("veil",!showEn);
+  const pb=$("#carPlay");
+  pb.innerHTML=P.playing?ICON.pauseL+"<span>일시정지</span>":ICON.playL+"<span>재생</span>";
+  pb.setAttribute("aria-label",P.playing?"일시정지":"재생");
+  if(!P.playing)setStage(P.i>=P.list.length?"끝까지 들었어요. 재생을 누르면 처음부터 다시 시작합니다.":"일시정지됨",0);
+}
+async function playSentence(s,tok){
+  const r=+S.set.rate||1, en=plain(s.en), mul=GAP[S.set.gap]||1;
+  const words=en.split(/\s+/).length;
+  const rep=Math.round((1000+words*450)*mul);
+  const steps=[];
+  if(S.set.order==="en"){
+    P.show={ko:true,en:false};
+    steps.push(["en",r,"영어 듣기"],["wait",rep,"따라 말해 보세요"]);
+    if(S.set.slow)steps.push(["en",r*.8,"천천히 한 번 더"],["wait",Math.round(rep*.7),"따라 말해 보세요"]);
+  }else if(s.role==="t"){
+    P.show={ko:false,en:false};
+    steps.push(["en",r,"현지에서 듣게 될 말"],["wait",Math.round(1600*mul),"무슨 뜻일까요?"],["ko",1,"한국어 뜻"],["wait",500,""],["en",S.set.slow?r*.85:r,"다시 듣기"]);
+  }else{
+    P.show={ko:false,en:false};
+    steps.push(["ko",1,"한국어 뜻"],["wait",Math.round(1500*mul),"영어로 떠올려 보세요"],["en",r,"영어 듣기"],["wait",rep,"따라 말해 보세요"]);
+    if(S.set.slow)steps.push(["en",r*.8,"천천히 한 번 더"],["wait",Math.round(rep*.7),"따라 말해 보세요"]);
+  }
+  steps.push(["wait",800,""]);
+  for(const st of steps){
+    if(tok!==P.token)return;
+    if(st[0]==="wait"){if(st[2])setStage(st[2],st[1]);await sleep(st[1]);}
+    else{
+      P.show[st[0]]=true; drawCar(); setStage(st[2],0);
+      await speak(st[0]==="ko"?s.ko:en,st[0],st[1]);
+    }
+  }
+}
+async function runFrom(i){
+  const tok=++P.token;
+  stopSpeech();
+  P.i=i; P.playing=true;
+  while(tok===P.token){
+    if(P.i>=P.list.length){
+      if(S.set.loop){P.i=0;if(S.set.shuffle)shuffle(P.list);}
+      else{P.playing=false;drawCar();return;}
+    }
+    await playSentence(P.list[P.i],tok);
+    if(tok!==P.token)return;
+    P.i++;
+  }
+}
+function carPause(){P.playing=false;P.token++;stopSpeech();drawCar();}
+function carToggle(){if(P.playing)carPause();else runFrom(P.i>=P.list.length?0:P.i);}
+function carStep(d){
+  const cur=Math.min(P.i,P.list.length-1);
+  const i=Math.max(0,Math.min(P.list.length-1,cur+d));
+  if(P.playing)runFrom(i);else{P.i=i;drawCar();}
+}
+async function wakeOn(){
+  const w=$("#carWake");
+  if(!("wakeLock" in navigator)){w.textContent="화면이 꺼지면 재생이 멈춰요. 학습 중에는 화면을 켜 두세요.";return;}
+  try{
+    P.wake=await navigator.wakeLock.request("screen");
+    w.textContent="재생 중에는 화면이 꺼지지 않도록 유지합니다.";
+    P.wake.addEventListener("release",()=>{P.wake=null;});
+  }catch(e){P.wake=null;w.textContent="화면이 꺼지면 재생이 멈춰요. 학습 중에는 화면을 켜 두세요.";}
+}
+function wakeOff(){try{if(P.wake)P.wake.release();}catch(e){}P.wake=null;}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&carOpen&&!P.wake)wakeOn();});
+
+function getList(range){
+  if(range==="today")return ALL.filter(s=>s.day===sel);
+  if(range==="done")return ALL.filter(s=>S.done[s.day]);
+  if(range==="favs")return S.favs.map(id=>BY[id]).filter(Boolean);
+  return ALL.slice();
+}
+function rangeLabel(range){
+  if(range==="today")return "DAY "+pad(sel)+" · "+D[sel-1].t;
+  if(range==="done")return "완료한 DAY 복습 · "+Object.keys(S.done).length+"일";
+  if(range==="favs")return "즐겨찾기 문장";
+  return "30일 전체";
+}
+function openCar(range){
+  const list=getList(range);
+  if(!list.length){toast(range==="favs"?"즐겨찾기한 문장이 아직 없어요.":"완료한 DAY가 아직 없어요.");return;}
+  P.list=S.set.shuffle?shuffle(list.slice()):list.slice();
+  P.label=rangeLabel(range);
+  $("#car").hidden=false; document.documentElement.classList.add("car-open"); carOpen=true;
+  runFrom(0);
+  if(!TTS.ok)toast("이 기기에서는 음성 읽기를 지원하지 않아 화면으로만 진행됩니다.");
+  wakeOn();
+}
+function closeCar(){P.playing=false;P.token++;stopSpeech();wakeOff();$("#car").hidden=true;document.documentElement.classList.remove("car-open");carOpen=false;}
+
+/* ───────── 화면 ───────── */
+function card(s,o){
+  o=o||{};
+  const fav=S.favs.indexOf(s.id)>=0;
+  const hide=S.set.hide&&!o.noHide&&!revealed.has(s.id);
+  return '<li class="sent'+(s.role==="t"?" them":"")+'">'+
+    '<div class="sent-top"><span class="sid">'+pad(s.day)+'-'+s.n+'</span><span class="role">'+(s.role==="t"?"듣게 될 말":"내가 말하기")+'</span>'+
+    '<button class="star'+(fav?" on":"")+'" data-fav="'+s.id+'" aria-pressed="'+fav+'" aria-label="즐겨찾기">'+ICON.star+'</button></div>'+
+    '<p class="ko">'+esc(s.ko)+'</p>'+
+    (hide?'<button class="reveal" data-reveal="'+s.id+'">눌러서 영어 확인</button>':'<p class="en" lang="en">'+hl(s.en)+'</p>')+
+    (s.tip?'<p class="tip"><span class="lbl">Tip</span>'+esc(s.tip)+'</p>':'')+
+    '<div class="sent-act"><button class="btn sm" data-say="'+s.id+'" data-rate="1">'+ICON.play+'듣기</button>'+
+    '<button class="btn sm ghost" data-say="'+s.id+'" data-rate="0.72">천천히</button>'+
+    (o.showDay?'<button class="btn sm ghost dayref" data-go="'+s.day+'">DAY '+pad(s.day)+' '+esc(D[s.day-1].t)+'</button>':'')+
+    '</div></li>';
+}
+
+function rToday(){
+  const d=D[sel-1], done=!!S.done[sel], fo=firstOpen(), doneN=Object.keys(S.done).length;
+  const them=d.s.filter(x=>x[0]==="t").length;
+  let track="";
+  for(let i=1;i<=30;i++)track+='<i class="'+(S.done[i]?"done":(i===sel?"cur":""))+'"></i>';
+  const status=done?'<span class="st ok">완료</span>':(sel===fo?'<span class="st">오늘 학습</span>':'<span class="st">미리 보기</span>');
+  let finish;
+  if(done){
+    finish='<div class="finish done"><p>DAY '+pad(sel)+' 완료 · '+esc(fmtDate(S.done[sel]))+'</p><div class="row">'+
+      (sel<30?'<button class="btn primary" data-go="'+(sel+1)+'">다음 DAY '+pad(sel+1)+' '+esc(D[sel].t)+'</button>':'<button class="btn primary" data-tab="saved">30일 과정 완주 · 복습하기</button>')+
+      '<button class="btn ghost" data-act="undo">완료 취소</button></div></div>';
+  }else{
+    finish='<div class="finish"><button class="btn primary wide big" data-act="complete">DAY '+pad(sel)+' 학습 완료</button></div>';
+  }
+  return '<header class="top"><div class="topline"><div><p class="eyebrow">Travel English · 30 days</p><h1>여행영어 30일</h1></div>'+(installEvt&&!standalone()?'<button class="btn sm primary install" data-act="install">앱 설치</button>':'')+'</div>'+
+    '<div class="stats"><span><b>'+streak()+'</b>일 연속</span><span><b>'+doneN+'</b> / 30일 완료</span><span>'+todayLabel()+'</span></div>'+
+    '<div class="track" aria-label="30일 중 '+doneN+'일 완료">'+track+'</div></header>'+
+    '<section class="pass" aria-label="오늘의 학습">'+
+      '<div class="pass-main"><p class="lbl">Day</p>'+
+        '<div class="pass-head"><span class="dnum">'+pad(sel)+'</span><span class="zone">'+esc(PH[d.p])+'</span></div>'+
+        '<h2 class="pass-title">'+esc(d.t)+'</h2>'+
+        '<p class="pass-sub" lang="en">'+esc(d.e)+'</p>'+
+        '<p class="pass-sub">문장 6개 · 그중 '+them+'개는 현지에서 듣게 될 말</p>'+
+        '<div class="pass-actions"><button class="btn primary" data-act="drive-today">'+ICON.play+'연속 듣기</button></div>'+
+      '</div>'+
+      '<div class="pass-stub"><span class="lbl">Gate</span><span class="gate">'+d.c+'</span><span class="lbl">Status</span>'+status+'</div>'+
+    '</section>'+
+    '<div class="daynav"><button class="btn sm ghost" data-go="'+(sel-1)+'" '+(sel<=1?"disabled":"")+'>‹ DAY '+pad(Math.max(1,sel-1))+'</button>'+
+    '<button class="btn sm ghost" data-go="'+(sel+1)+'" '+(sel>=30?"disabled":"")+'>DAY '+pad(Math.min(30,sel+1))+' ›</button></div>'+
+    '<div class="listbar"><h2>오늘의 문장</h2><label class="switch" for="hideEn">영어 가리기<input type="checkbox" class="sw" id="hideEn"'+(S.set.hide?" checked":"")+'></label></div>'+
+    '<ol class="sents">'+ALL.filter(s=>s.day===sel).map(s=>card(s)).join("")+'</ol>'+finish;
+}
+
+function seg(key,label,opts){
+  return '<div class="group"><p class="glabel">'+label+'</p><div class="seg" role="group" aria-label="'+label+'">'+
+    opts.map(o=>'<button data-set="'+key+'" data-val="'+o[0]+'" aria-pressed="'+(String(S.set[key])===o[0])+'">'+o[1]+'</button>').join("")+'</div></div>';
+}
+function rDrive(){
+  const c={today:getList("today").length,done:getList("done").length,favs:getList("favs").length,all:ALL.length};
+  let range=S.set.range; if(!c[range])range="today";
+  const R=[["today","오늘의 DAY "+pad(sel),D[sel-1].t],["done","완료한 DAY 복습",Object.keys(S.done).length+"일 분량"],["favs","즐겨찾기","저장한 문장"],["all","30일 전체","모든 상황"]];
+  const tg=(k,l)=>'<label class="tg" for="tg-'+k+'"><span>'+l+'</span><input type="checkbox" class="sw" id="tg-'+k+'" data-tg="'+k+'"'+(S.set[k]?" checked":"")+'></label>';
+  return '<header class="top"><p class="eyebrow">Drive mode</p><h1>차에서 듣기</h1>'+
+    '<p class="lede">화면을 보지 않아도 되도록 한국어 뜻을 먼저 읽고, 영어로 떠올릴 시간을 준 뒤 영어 문장을 들려줍니다. 문장마다 따라 말할 시간도 둡니다.</p></header>'+
+    (TTS.ok?'':'<p class="warn">이 브라우저는 음성 읽기를 지원하지 않습니다. Chrome이나 삼성 인터넷 최신 버전에서 열어 주세요.</p>')+
+    '<div class="group"><p class="glabel">무엇을 들을까요</p><div class="ranges">'+
+      R.map(x=>'<button class="range" data-range="'+x[0]+'" aria-pressed="'+(x[0]===range)+'"'+(c[x[0]]?"":" disabled")+'><b>'+esc(x[1])+'</b><small>'+esc(x[2])+' · '+c[x[0]]+'문장</small></button>').join("")+
+    '</div></div>'+
+    seg("order","듣는 순서",[["ko","한국어 뜻 → 영어"],["en","영어만"]])+
+    seg("rate","영어 속도",[["0.85","천천히"],["1","보통"],["1.1","조금 빠르게"]])+
+    seg("gap","따라 말할 시간",[["short","짧게"],["normal","보통"],["long","넉넉히"]])+
+    '<div class="group"><div class="toggles">'+tg("slow","영어를 천천히 한 번 더 듣기")+tg("shuffle","순서 섞기")+tg("loop","끝나면 처음부터 다시 듣기")+'</div></div>'+
+    '<div class="start"><button class="btn primary wide big" data-act="start-drive" data-range="'+range+'">'+ICON.play+'드라이브 모드 시작</button></div>'+
+    '<ul class="notes"><li>출발 전에 재생을 시작하고, 운전 중에는 화면을 조작하지 마세요.</li>'+
+    '<li>휴대폰을 차량 블루투스에 연결하면 차 스피커로 들을 수 있어요.</li>'+
+    '<li>재생 중에는 화면이 꺼지지 않게 유지합니다. 다른 앱으로 전환하거나 화면을 끄면 재생이 멈출 수 있어요.</li></ul>';
+}
+
+function rCourse(){
+  const fo=firstOpen(), doneN=Object.keys(S.done).length;
+  let board="";
+  PH_ORDER.forEach(p=>{
+    const idx=[]; D.forEach((d,i)=>{if(d.p===p)idx.push(i+1);});
+    board+='<section class="phase"><div class="phase-h"><h2>'+PH[p]+'</h2><span class="lbl">Day '+pad(idx[0])+'–'+pad(idx[idx.length-1])+'</span></div><ul class="board">'+
+      idx.map(n=>{
+        const d=D[n-1];
+        const chip=S.done[n]?'<span class="chip ok">완료</span>':(n===fo?'<span class="chip next">다음</span>':'<span class="chip plan">예정</span>');
+        return '<li><button class="brow" data-go="'+n+'"><span class="bday">DAY '+pad(n)+'</span><span class="bt"><b>'+esc(d.t)+'</b><small lang="en">'+esc(d.e)+'</small></span>'+chip+'</button></li>';
+      }).join("")+'</ul></section>';
+  });
+  return '<header class="top"><p class="eyebrow">Course · 30 days · '+ALL.length+' sentences</p><h1>전체 과정</h1>'+
+    '<p class="lede">공항 체크인부터 작별 인사까지 여행 순서대로, 하루 한 상황씩 익힙니다. 지금 '+doneN+'일째까지 마쳤어요.</p></header>'+
+    '<div class="searchbox"><input id="q" type="search" placeholder="문장 찾기 (예: 환불, check in)" autocomplete="off" aria-label="문장 검색"></div>'+
+    '<div id="results" hidden></div><div id="board">'+board+'</div>';
+}
+function drawResults(){
+  const r=$("#results"), b=$("#board"); if(!r||!b)return;
+  const q=query.trim().toLowerCase();
+  if(!q){r.hidden=true;b.hidden=false;r.innerHTML="";return;}
+  const hits=ALL.filter(s=>s.ko.toLowerCase().indexOf(q)>=0||plain(s.en).toLowerCase().indexOf(q)>=0||s.tip.toLowerCase().indexOf(q)>=0||D[s.day-1].t.indexOf(q)>=0);
+  const shown=hits.slice(0,40);
+  r.hidden=false; b.hidden=true;
+  r.innerHTML=shown.length?'<p class="count">'+hits.length+'개 문장'+(hits.length>40?' 중 40개 표시':'')+'</p><ol class="sents">'+shown.map(s=>card(s,{showDay:true,noHide:true})).join("")+'</ol>'
+    :'<p class="empty-line">\''+esc(query.trim())+'\'와 맞는 문장이 없어요. 다른 단어로 찾아보세요.</p>';
+}
+
+function rSaved(){
+  const favs=S.favs.map(id=>BY[id]).filter(Boolean), doneN=Object.keys(S.done).length;
+  return '<header class="top"><p class="eyebrow">Review</p><h1>복습 노트</h1>'+
+    '<p class="lede">외우기 어려운 문장은 별을 눌러 모아 두고, 차에서 반복해서 들어 보세요.</p></header>'+
+    '<div class="row" style="margin-top:18px"><button class="btn primary" data-act="drive-favs"'+(favs.length?"":" disabled")+'>'+ICON.play+'즐겨찾기 '+favs.length+'문장 듣기</button>'+
+    '<button class="btn" data-act="drive-done"'+(doneN?"":" disabled")+'>완료한 '+doneN+'일 복습</button></div>'+
+    (favs.length?'<ol class="sents" style="margin-top:18px">'+favs.map(s=>card(s,{showDay:true,noHide:true})).join("")+'</ol>'
+      :'<div class="empty"><p class="empty-t">아직 저장한 문장이 없어요</p><p>문장 카드 오른쪽 위의 별을 누르면 여기에 모입니다. DAY '+pad(sel)+' '+esc(D[sel-1].t)+'에서 어려운 문장을 골라 보세요.</p><button class="btn" data-go="'+sel+'">DAY '+pad(sel)+' 문장 보기</button></div>');
+}
+
+const view=$("#view");
+function render(){
+  if(tab==="today")view.innerHTML=rToday();
+  else if(tab==="drive")view.innerHTML=rDrive();
+  else if(tab==="course"){view.innerHTML=rCourse();const q=$("#q");if(q)q.value=query;drawResults();}
+  else view.innerHTML=rSaved();
+  document.querySelectorAll(".tabbar button").forEach(b=>{const on=b.dataset.tab===tab;b.classList.toggle("on",on);if(on)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});
+}
+function setTab(t){tab=t;render();window.scrollTo(0,0);}
+
+function toggleFav(id){
+  const i=S.favs.indexOf(id);
+  if(i>=0)S.favs.splice(i,1);else S.favs.push(id);
+  commit();
+  const on=i<0;
+  if(tab==="saved"){render();}
+  else document.querySelectorAll('[data-fav="'+id+'"]').forEach(b=>{b.classList.toggle("on",on);b.setAttribute("aria-pressed",String(on));});
+  toast(on?"즐겨찾기에 담았어요.":"즐겨찾기에서 뺐어요.");
+}
+
+/* ───────── 이벤트 ───────── */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b||b.disabled)return;
+  const ds=b.dataset;
+  if(ds.car){
+    if(ds.car==="close")closeCar();
+    else if(ds.car==="toggle")carToggle();
+    else if(ds.car==="prev")carStep(-1);
+    else if(ds.car==="next")carStep(1);
+    return;
+  }
+  if(ds.tab){setTab(ds.tab);return;}
+  if(ds.fav){toggleFav(ds.fav);return;}
+  if(ds.say){sayOne(b,ds.say,+ds.rate||1);return;}
+  if(ds.reveal){revealed.add(ds.reveal);render();return;}
+  if(ds.go){const n=+ds.go;if(n>=1&&n<=30){sel=n;selTouched=true;setTab("today");}return;}
+  if(ds.set){let v=ds.val;if(ds.set==="rate")v=+v;S.set[ds.set]=v;commit();render();return;}
+  if(ds.act==="start-drive"){openCar(ds.range||"today");return;}
+  if(ds.range&&!ds.act){S.set.range=ds.range;commit();render();return;}
+  switch(ds.act){
+    case "install":
+      if(installEvt){const ev=installEvt;installEvt=null;ev.prompt();ev.userChoice.finally(()=>render());}
+      break;
+    case "drive-today":openCar("today");break;
+    case "drive-favs":openCar("favs");break;
+    case "drive-done":openCar("done");break;
+    case "complete":
+      S.done[sel]=ymd(new Date());commit();render();
+      toast("DAY "+pad(sel)+" 완료 · 연속 "+streak()+"일째");
+      break;
+    case "undo":
+      delete S.done[sel];commit();render();
+      break;
+  }
+});
+document.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.id==="hideEn"){S.set.hide=t.checked;revealed.clear();commit();render();return;}
+  if(t.dataset&&t.dataset.tg){S.set[t.dataset.tg]=t.checked;commit();}
+});
+document.addEventListener("input",e=>{if(e.target.id==="q"){query=e.target.value;drawResults();}});
+document.addEventListener("keydown",e=>{
+  if(!carOpen)return;
+  if(e.key==="Escape")closeCar();
+  else if(e.key==="ArrowLeft")carStep(-1);
+  else if(e.key==="ArrowRight")carStep(1);
+  else if(e.key===" "&&!(e.target.closest&&e.target.closest("button"))){e.preventDefault();carToggle();}
+});
+
+const h=(location.hash||"").slice(1);
+if(["today","drive","course","saved"].indexOf(h)>=0)tab=h;
+render();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});}
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+})();
+</script>
+</body>
+</html>
