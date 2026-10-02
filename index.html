@@ -140,6 +140,16 @@ h2{font-size:18px;font-weight:600;line-height:1.3}
 .en{margin-top:2px;font-size:19px;line-height:1.42;font-weight:500;overflow-wrap:anywhere}
 mark{background:linear-gradient(transparent 56%,var(--mark) 56%);color:inherit;padding:0 1px}
 .tip{margin-top:8px;font-size:13px;color:var(--muted)}
+.alts{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.alts .lbl{font-size:10px}
+.alt{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:var(--surface-2);border:0;border-radius:10px;padding:8px 10px;cursor:pointer;min-height:40px}
+.them .alt{background:transparent;border:1px solid var(--line)}
+.alt svg{flex:none;color:var(--muted)}
+.alt-en{font-size:15px;font-weight:500;min-width:0;overflow-wrap:anywhere}
+.alt-note{font-size:12px;color:var(--muted);margin-left:auto;white-space:nowrap;flex:none}
+.alt.playing{box-shadow:inset 0 0 0 1px var(--accent)}
+@media (max-width:380px){.alt{flex-wrap:wrap}.alt-note{margin-left:30px;white-space:normal}}
+.car-alt{font-size:clamp(18px,5vw,26px);line-height:1.35;color:var(--car-fg);min-height:1.4em}
 .tip .lbl{margin-right:8px;font-size:10px}
 .reveal{margin-top:6px;width:100%;text-align:left;border:1px dashed var(--line);background:transparent;color:var(--muted);border-radius:10px;padding:10px 12px;font-size:15px;cursor:pointer}
 .sent-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
@@ -261,6 +271,7 @@ mark{background:linear-gradient(transparent 56%,var(--mark) 56%);color:inherit;p
       <p class="car-meta"><span id="carDay"></span> · <span id="carRole"></span></p>
       <p id="carKo" class="car-ko"></p>
       <p id="carEn" class="car-en" lang="en"></p>
+      <p id="carAlt" class="car-alt" lang="en"></p>
       <div class="car-stage"><p id="carStage" class="stage-l">&nbsp;</p><div class="bar"><i id="carBar"></i></div></div>
     </div>
     <p id="carCount" class="car-count"></p>
@@ -283,223 +294,282 @@ const PH_ORDER=["AIR","HTL","MOVE","FOOD","TOUR","HELP","TALK"];
 /* 문장: [역할 m=내가 말하기 / t=듣게 될 말, 영어([ ]=핵심 패턴), 한국어, 팁] */
 const D=[
 {t:"공항 체크인",e:"Airport check-in",c:"CHK",p:"AIR",s:[
-["m","I'd like to [check in for] my flight to London.","런던행 비행기 체크인하려고 합니다.","check in for + 항공편: ~편 체크인하다"],
-["t","May I see your passport, please?","여권 좀 보여 주시겠어요?",""],
-["m","[Could I get] an aisle seat?","통로 쪽 좌석으로 받을 수 있을까요?","창가석은 window seat"],
-["t","How many bags are you checking in?","부치실 짐이 몇 개인가요?","check in a bag: 짐을 부치다"],
-["m","[Just one], and this one is a carry-on.","하나만 부칠게요. 이건 기내용이에요.","carry-on: 기내 반입 가방"],
-["m","[Is the flight on time]?","비행기 제시간에 출발하나요?","on time 정시 / delayed 지연"]]},
+["m","Hi, [I'm checking in for] the 10 a.m. flight to London.","안녕하세요, 10시 런던행 비행기 체크인하려고요.","check in for + 항공편",[["I'd like to check in, please.","가장 짧고 무난한 말"],["I'm on the 10 o'clock to London.","현지인들이 자주 쓰는 축약형"]]],
+["t","Can I see your passport and booking reference?","여권과 예약번호 좀 보여 주시겠어요?","booking reference(영) = confirmation number(미): 예약번호"],
+["m","[Any chance of] an aisle seat?","통로 쪽 좌석 가능할까요?","Any chance of ~?: 부담 없이 부탁할 때",[["Could I get an aisle seat?","정중한 기본형"],["Is there a window seat still open?","창가석이 남았는지"]]],
+["t","How many bags are you checking today?","오늘 부치실 짐이 몇 개세요?","check a bag: 짐을 부치다"],
+["m","[Just the one], and I've got a carry-on.","하나만요. 그리고 기내용 가방 하나 있어요.","I've got = I have (구어)",[["Just this one.","캐리어를 가리키며"],["No checked bags, just carry-on.","부칠 짐이 없을 때"]]],
+["t","That's a little over the weight limit, I'm afraid.","죄송하지만 무게가 조금 초과됐네요.","I'm afraid: 안 좋은 소식을 부드럽게 전할 때"],
+["m","[Can I move some stuff] into my carry-on?","짐 일부를 기내용 가방으로 옮겨도 될까요?","stuff: 물건(구어)",[["Let me shift a few things around.","바로 짐을 옮기며"]]],
+["m","[Are we] on time?","제시간에 출발하나요?","on time 정시 / running late 늦어지는",[["Is the flight still on schedule?",""],["Any delays?","아주 짧게"]]]]},
 {t:"보안검색·탑승구",e:"Security & gate",c:"SEC",p:"AIR",s:[
-["t","Please take your laptop out of the bag.","노트북은 가방에서 꺼내 주세요.",""],
-["m","[Do I need to take off] my shoes?","신발도 벗어야 하나요?","Do I need to ~?: ~해야 하나요?"],
-["t","Do you have any liquids in your bag?","가방에 액체류 있으세요?",""],
-["m","[Where is] Gate 23?","23번 게이트가 어디예요?",""],
-["m","[Has boarding started] for this flight?","이 비행기 탑승 시작했나요?",""],
-["m","[Is this the line for] Group 3?","3번 그룹 줄이 여기인가요?","line: 줄 (영국은 queue)"]]},
+["t","Laptops and liquids out, please. Shoes stay on.","노트북과 액체류는 꺼내 주세요. 신발은 신고 계셔도 됩니다.","미국 공항에선 신발을 벗으라고 할 때도 있어요"],
+["m","[Do I need to] take my belt off?","벨트도 풀어야 하나요?","",[["Does this need to come out?","가방 속 물건을 들어 보이며"],["Is this okay to bring through?","반입 가능 여부"]]],
+["t","Step through, please. Arms up.","통과하세요. 팔 올려 주세요.","전신 스캐너 안내"],
+["m","[Sorry, where's] Gate 23?","죄송한데 23번 게이트가 어디죠?","Sorry로 시작하면 영국식으로 자연스러워요",[["Which way to the gates?","방향만 물을 때"],["Am I heading the right way for the B gates?","가는 길이 맞는지"]]],
+["t","Boarding will begin shortly. Please have your boarding pass ready.","곧 탑승을 시작합니다. 탑승권을 준비해 주세요.","shortly: 곧"],
+["m","[Has boarding started] yet?","탑승 시작했나요?","",[["Are they boarding yet?","캐주얼"],["What group are they on?","미국 항공사의 그룹 탑승"]]],
+["m","[Is this the line for] Group 3?","3번 그룹 줄이 여기예요?","line(미) / queue(영)",[["Is this the queue for Group 3?","영국·호주"],["Are you in line?","앞사람에게"]]],
+["t","We're a bit oversold today. Anyone willing to take a later flight?","오늘 좌석이 초과 판매되었습니다. 다음 비행기를 타실 분 계신가요?","oversold: 초과 판매 / be willing to: 기꺼이 ~하다"]]},
 {t:"기내에서",e:"On board",c:"CAB",p:"AIR",s:[
-["m","[Could I have] some water, please?","물 좀 주시겠어요?","Could I have ~?: 가장 무난한 요청"],
-["t","Would you like chicken or beef?","닭고기와 소고기 중 어떤 걸로 드릴까요?",""],
-["m","[I'll have] the beef, please.","소고기로 할게요.","I'll have ~: 주문할 때 기본형"],
-["m","[Would you mind if I] put my seat back?","의자를 좀 뒤로 젖혀도 될까요?","Would you mind if I ~?: ~해도 괜찮을까요?"],
-["m","[Could you help me] put this bag up?","이 가방 올리는 것 좀 도와주시겠어요?",""],
-["m","[Can I get] an extra blanket?","담요 하나 더 받을 수 있을까요?",""]]},
+["m","[Could I get] a water when you get a sec?","시간 되실 때 물 한 잔 주시겠어요?","when you get a sec: 바쁜 승무원에게 쓰는 배려 표현",[["Can I grab a water?","아주 캐주얼"],["Water, please. No ice.","짧게, 얼음 빼고"]]],
+["t","Chicken or pasta?","닭고기요, 파스타요?","기내식은 보통 두 단어로 물어요"],
+["m","[I'll go with] the chicken.","닭고기로 할게요.","I'll go with ~: 고를 때",[["Chicken, please.","가장 짧게"],["I'll have the pasta, thanks.","I'll have ~"]]],
+["m","[Mind if I] put my seat back a bit?","의자 좀 뒤로 젖혀도 괜찮을까요?","Mind if I ~?: Would you mind if I 의 축약",[["Is it okay if I recline?",""],["Sorry, just going to recline a little.","미리 알리기"]]],
+["m","[Would you mind helping me with] this bag?","이 가방 좀 도와주시겠어요?","",[["Could you give me a hand with this?","give me a hand: 도와주다"]]],
+["m","[Can I get] another blanket?","담요 하나 더 주실 수 있나요?","",[["Do you have any extra blankets?",""],["Could I get some headphones?","이어폰"]]],
+["t","Please return your seat to the upright position and stow your tray table.","좌석 등받이를 세우고 테이블을 접어 주세요.","stow: 접어 넣다"],
+["m","[Sorry, could I squeeze past]?","죄송한데 좀 지나갈게요.","통로 쪽 승객에게",[["Excuse me, I need to get out.",""],["Sorry, just need to pop to the loo.","영국식, loo = 화장실"]]]]},
 {t:"입국심사",e:"Immigration",c:"IMM",p:"AIR",s:[
-["t","What's the purpose of your visit?","방문 목적이 무엇인가요?",""],
-["m","[I'm here on] vacation.","휴가차 왔습니다.","출장이면 I'm here on business."],
-["t","How long will you be staying?","얼마나 머무르실 건가요?",""],
-["m","[I'm staying for] ten days.","열흘 동안 있을 예정입니다.",""],
-["m","[I'm staying at] the Hilton downtown.","시내 힐튼 호텔에 묵습니다.",""],
-["m","[Here's my] return ticket.","여기 귀국 항공권입니다.","Here's my ~: 서류를 건넬 때"]]},
+["t","What brings you to the States?","미국엔 무슨 일로 오셨어요?","What brings you to ~?: 방문 목적을 묻는 가장 흔한 말"],
+["m","[I'm here on] vacation, about ten days.","휴가로 왔고, 열흘 정도 있을 거예요.","",[["Just a holiday.","영국·호주식 holiday"],["I'm visiting a friend in Boston.","지인 방문"],["Business. I've got meetings in Chicago.","출장"]]],
+["t","Where are you staying?","어디에 머무세요?",""],
+["m","[At the] Hilton downtown. [Here's the] booking.","시내 힐튼이요. 여기 예약 확인서예요.","휴대폰 화면을 보여 주며",[["With a friend. Here's her address.","지인 집"]]],
+["t","Have you been to the States before?","미국에 와 보신 적 있으세요?",""],
+["m","[This is my first time].","이번이 처음이에요.","",[["A couple of times, for work.","몇 번, 출장으로"],["Once, about five years ago.","한 번, 5년 전에"]]],
+["t","Anything to declare? Any food, plants, or cash over ten thousand?","신고할 것 있으세요? 음식, 식물, 1만 달러 넘는 현금?","declare: 세관 신고"],
+["m","[Nothing to declare]. [Just] some snacks.","신고할 건 없어요. 과자 조금뿐이에요.","",[["No, nothing.",""],["I have some packaged food, is that okay?","포장 식품 확인"]]]]},
 {t:"수하물·세관",e:"Baggage & customs",c:"BAG",p:"AIR",s:[
-["m","[Where can I pick up] my baggage?","짐은 어디서 찾나요?","baggage claim: 수하물 찾는 곳"],
-["m","[My bag hasn't come out] yet.","제 가방이 아직 안 나왔어요.",""],
-["m","[I'd like to report] a missing bag.","가방 분실 신고를 하려고 합니다.",""],
-["t","Can you describe your bag?","가방이 어떻게 생겼는지 말씀해 주시겠어요?",""],
-["m","[It's a] black suitcase [with] a red tag.","빨간 태그가 달린 검은색 캐리어예요.","It's a + 색 + 물건 + with ~"],
-["t","Do you have anything to declare?","신고할 물품 있으세요?","declare: 세관에 신고하다"]]},
+["m","[Which carousel is] the flight from Seoul?","서울발 비행기 짐은 몇 번 컨베이어예요?","carousel: 수하물 컨베이어",[["Where do I pick up my bags?","기본형"],["Is this belt for KE081?","편명으로"]]],
+["m","[My bag didn't show up].","제 가방이 안 나왔어요.","show up: 나타나다",[["My suitcase hasn't come through.","영국식"],["I think my bag's missing.",""]]],
+["t","Can you describe the bag for me?","가방 생김새를 말씀해 주시겠어요?",""],
+["m","[It's a] medium black hard-shell [with] a red strap.","중간 크기 검은색 하드 케이스고 빨간 스트랩이 있어요.","hard-shell: 하드 캐리어",[["Here, I've got a photo of it.","사진을 보여 주며"]]],
+["t","We'll deliver it to your hotel once it turns up.","찾는 대로 호텔로 배달해 드릴게요.","turn up: 나타나다(= show up)"],
+["m","[Can I get] a reference number [for that]?","접수 번호 받을 수 있을까요?","",[["How do I track it?","추적 방법"],["Who do I call if it doesn't arrive?","안 오면 연락처"]]],
+["t","Anything to declare? Please place your bag on the belt.","신고할 것 있으세요? 가방을 벨트에 올려 주세요.",""],
+["m","[It's just] gifts and personal stuff.","선물이랑 개인 물품뿐이에요.","",[["Nothing commercial, just gifts.","판매 목적 아님"]]]]},
 {t:"환승·지연",e:"Transfers & delays",c:"TRF",p:"AIR",s:[
-["m","[I have a connecting flight] to Paris.","파리로 가는 환승편이 있어요.",""],
-["m","[Where do I go for] transfers?","환승하려면 어디로 가야 하나요?",""],
-["m","[I missed my] connecting flight.","환승 비행기를 놓쳤어요.",""],
-["t","We can put you on the next flight.","다음 항공편으로 바꿔 드릴게요.",""],
-["m","[What time does] the next flight leave?","다음 비행기는 몇 시에 출발하나요?",""],
-["m","[Can I get] a meal voucher?","식사 쿠폰을 받을 수 있나요?","오래 지연될 때 항공사에 요청해 볼 수 있어요"]]},
+["m","[I'm connecting to] Paris. [Where do I go]?","파리로 환승하는데 어디로 가야 하나요?","connect to: 환승하다",[["I've got a connection to Paris. Which way?",""],["Do I have to go through security again?","보안검색 재통과"]]],
+["t","Follow the signs for Flight Connections. You don't need to collect your bags.","환승 표지판을 따라가세요. 짐은 찾지 않으셔도 됩니다.",""],
+["m","[Will my bag go straight through]?","짐은 바로 연결되나요?","",[["Is my bag checked through to Paris?","checked through: 최종 목적지까지 부쳐짐"]]],
+["m","[My flight got delayed and] I missed my connection.","비행기가 지연돼서 환승을 놓쳤어요.","",[["I've missed my connecting flight.",""],["I'm going to miss my connection. What are my options?","놓치기 전에"]]],
+["t","We can rebook you on the 6:40. There's a hotel voucher if you need one.","6시 40분 편으로 바꿔 드릴 수 있어요. 필요하시면 호텔 바우처도 있습니다.","rebook: 재예약"],
+["m","[Could you put me on] the earliest one?","가장 빠른 걸로 바꿔 주실 수 있나요?","",[["What's the next available flight?",""],["Is there anything on another airline?","타 항공사"]]],
+["m","[Am I entitled to] a meal voucher?","식사 쿠폰 받을 수 있나요?","be entitled to: ~받을 자격이 있다",[["Do you give out meal vouchers for this?","캐주얼"]]],
+["t","Keep your receipts and file a claim on our website.","영수증을 보관하시고 홈페이지에서 보상 신청하세요.","file a claim: 보상 청구하다"]]},
 {t:"호텔 체크인",e:"Hotel check-in",c:"HTL",p:"HTL",s:[
-["m","[I have a reservation under] Kim.","김 이름으로 예약했습니다.","under + 이름: ~ 이름으로"],
-["t","Can I have a credit card for incidentals?","부대비용 보증용 신용카드 주시겠어요?","incidentals: 부대비용(보증금)"],
-["m","[Is breakfast included]?","조식 포함인가요?",""],
-["m","[What time is] check-out?","체크아웃은 몇 시인가요?",""],
-["m","[What's the] Wi-Fi password?","와이파이 비밀번호가 뭔가요?",""],
-["m","[Could I check in early]?","일찍 체크인할 수 있을까요?","늦게 나가려면 late check-out"]]},
+["m","Hi, [checking in]. [It's under] Kim.","안녕하세요, 체크인이요. 김 이름으로 예약했어요.","It's under + 성: 예약자 이름을 말할 때",[["I have a reservation under Kim.","정중한 기본형"],["Booked through Booking.com, name's Kim.","예약 경로까지"]]],
+["t","Welcome! Can I get a card on file for incidentals?","환영합니다! 부대비용용으로 카드 하나 등록해 두어도 될까요?","on file: 등록해 두다 / incidentals: 부대비용"],
+["m","[Is breakfast included], and what time does it run?","조식 포함인가요? 몇 시까지 하나요?","",[["What time's breakfast?","짧게"],["Where's breakfast served?","장소"]]],
+["m","[What's the Wi-Fi]?","와이파이는 어떻게 되나요?","비밀번호까지 묻는 뜻으로 통해요",[["Is the Wi-Fi free?",""],["Could you write the Wi-Fi password down for me?",""]]],
+["m","[Any chance of] an early check-in? [I'm happy to] wait.","일찍 체크인 가능할까요? 기다려도 괜찮아요.","",[["Could I leave my bags until the room's ready?","짐 맡기기"],["Could I get a late check-out tomorrow?","늦은 체크아웃"]]],
+["t","You're in room 1204. The elevators are just around the corner.","1204호입니다. 엘리베이터는 바로 모퉁이 돌면 있어요.","elevator(미) / lift(영)"],
+["m","[Is there] somewhere nearby to grab a quick bite?","근처에 간단히 먹을 데가 있을까요?","grab a bite: 간단히 먹다",[["Any good spots around here for dinner?",""],["What's within walking distance?","걸어갈 만한 곳"]]],
+["t","Here are your keys. Just let us know if you need anything.","여기 키입니다. 필요한 것 있으면 말씀해 주세요.",""]]},
 {t:"객실 요청",e:"Room requests",c:"REQ",p:"HTL",s:[
-["m","[Could I get] a room on a higher floor?","더 높은 층 방으로 받을 수 있을까요?",""],
-["m","[Could you send up] two more towels?","수건 두 장 더 올려 주시겠어요?","send up: 객실로 올려 보내다"],
-["m","[Could I get] a wake-up call at six?","6시에 모닝콜 부탁드려도 될까요?","모닝콜은 wake-up call"],
-["m","[Could you hold my luggage] until 3 p.m.?","오후 3시까지 짐 좀 맡아 주실 수 있나요?",""],
-["t","Would you like your room cleaned today?","오늘 객실 청소해 드릴까요?",""],
-["m","[Is there] a gym in the hotel?","호텔에 피트니스 센터가 있나요?","Is there ~?: ~이 있나요?"]]},
+["m","Hi, [this is room] 1204. [Could I get] a couple more towels sent up?","1204호인데요, 수건 두어 장 더 올려 주실 수 있나요?","전화로 요청할 때는 방 번호부터",[["Could someone bring up some extra towels?",""],["We're out of toilet paper.","휴지가 떨어졌을 때"]]],
+["m","[Could I get] a higher floor, [away from] the elevator?","엘리베이터에서 떨어진 높은 층 방으로 될까요?","",[["Is there anything with a better view?","전망"],["Could we get two rooms next to each other?","붙은 방"]]],
+["m","[Could I get] a wake-up call at six?","6시에 모닝콜 부탁드려요.","모닝콜 = wake-up call",[["Can you set a wake-up call for 6 a.m.?",""]]],
+["m","[Could you hold my bags] till around three?","3시쯤까지 짐 좀 맡아 주실 수 있나요?","",[["Can I leave these with you for a few hours?",""],["Is there a luggage room?","짐 보관실"]]],
+["t","Would you like housekeeping today?","오늘 객실 청소 해 드릴까요?","housekeeping: 객실 청소"],
+["m","[No need], thanks. [Just] fresh towels [would be great].","괜찮아요. 수건만 새로 주시면 좋겠어요.","",[["We're fine for today.",""],["Could you skip our room today?",""]]],
+["m","[Is there] a gym or a pool? [What are the hours]?","헬스장이나 수영장 있나요? 몇 시까지 하나요?","",[["Where's the ice machine?","얼음 기계(미국 호텔)"],["Do you have a laundry service?","세탁"]]],
+["t","Sure, I'll have someone bring that right up.","네, 바로 올려 보내 드릴게요.","have someone + 동사: ~하도록 시키다"]]},
 {t:"객실 문제 해결",e:"Room problems",c:"FIX",p:"HTL",s:[
-["m","[The air conditioner isn't working].","에어컨이 작동하지 않아요.","~ isn't working: 고장 났을 때"],
-["m","[There's no hot water] in my room.","방에 온수가 안 나와요.",""],
-["m","[I locked myself out of] my room.","키를 두고 나와서 방에 못 들어가요.",""],
-["m","[The room next door is] really noisy.","옆방이 너무 시끄러워요.",""],
-["m","[Would it be possible to] change rooms?","방을 바꿀 수 있을까요?","Would it be possible to ~?: 정중한 요청"],
-["t","I'll send someone up right away.","바로 직원을 올려 보내겠습니다.",""]]},
+["m","[The AC's not working] in 1204.","1204호 에어컨이 안 돼요.","AC = air conditioning",[["The air con's blowing warm air.","영국식 air con"],["The heating won't turn on.","난방"]]],
+["m","[There's no hot water].","온수가 안 나와요.","",[["The shower's just running cold.",""],["The toilet's blocked.","변기 막힘"]]],
+["m","[I've locked myself out].","키를 안에 두고 나와서 못 들어가요.","",[["My key card's stopped working.","키 카드 작동 안 함"]]],
+["m","[The room next door is] really loud. [Is there anything you can do]?","옆방이 너무 시끄러워요. 어떻게 좀 해 주실 수 있나요?","",[["Could you ask them to keep it down?","조용히 해 달라고"],["Could we switch rooms?","방 교체"]]],
+["t","I'm so sorry about that. I'll send maintenance up right away.","정말 죄송합니다. 바로 시설 담당을 올려 보낼게요.","maintenance: 시설 관리 직원"],
+["m","[It's still not fixed]. [Can we] move rooms?","아직도 안 고쳐졌어요. 방을 바꿔 주실 수 있나요?","",[["Honestly, I'd rather just change rooms.","솔직히 방을 바꾸고 싶다"]]],
+["t","We can move you to a suite at no extra charge.","추가 요금 없이 스위트룸으로 옮겨 드릴게요.","at no extra charge: 추가 요금 없이"],
+["m","[That'd be great], thanks [for sorting it out].","그럼 좋죠. 해결해 주셔서 감사해요.","sort out: 해결하다(영국에서 특히 많이 씀)",[["Appreciate it.","미국식 짧은 감사"]]]]},
 {t:"체크아웃",e:"Check-out",c:"OUT",p:"HTL",s:[
-["m","[I'd like to check out], please.","체크아웃할게요.",""],
+["m","Hi, [checking out]. [Room] 1204.","체크아웃이요. 1204호예요.","",[["I'd like to check out, please.",""],["Can I do an express check-out?","빠른 체크아웃"]]],
 ["t","Did you have anything from the minibar?","미니바 이용하신 것 있으세요?",""],
-["m","[I didn't use] the minibar.","미니바는 이용하지 않았어요.",""],
-["m","[I think there's a mistake] on my bill.","계산서에 착오가 있는 것 같아요.","I think ~: 단정을 피하는 부드러운 표현"],
-["m","[Could you call a taxi] for me?","택시 좀 불러 주시겠어요?",""],
-["m","[Could I get] a receipt?","영수증 받을 수 있을까요?",""]]},
+["m","[Nope], [nothing].","아뇨, 없어요.","Nope: No의 구어",[["Just a bottle of water.","생수 하나"]]],
+["m","[What's this charge] for?","이 요금은 뭔가요?","계산서를 가리키며",[["I don't think I ordered this.","주문한 적 없음"],["This doesn't look right.","이상한 것 같다"]]],
+["t","That's the resort fee. It's charged per night.","리조트 요금입니다. 1박당 부과돼요.","resort fee: 미국 호텔의 시설 이용료"],
+["m","[Could you email me] the receipt?","영수증을 이메일로 보내 주시겠어요?","",[["Can I get an itemized receipt?","항목별 영수증"]]],
+["m","[Could you get me a cab] to the airport?","공항 가는 택시 좀 불러 주시겠어요?","cab = taxi",[["Is there a shuttle to the airport?","셔틀"],["How long does it take to the airport this time of day?","소요 시간"]]],
+["t","All set. Safe travels!","다 됐습니다. 안전한 여행 되세요!","All set: 다 됐다(미국에서 매우 흔함)"]]},
 {t:"택시·차량 호출",e:"Taxis & rides",c:"TXI",p:"MOVE",s:[
-["t","Where are you headed?","어디로 가세요?",""],
-["m","[Could you take me to] this address?","이 주소로 가 주시겠어요?","휴대폰 화면을 보여 주며 쓰기 좋은 문장"],
-["m","[How long does it take to] get to the airport?","공항까지 얼마나 걸리나요?",""],
-["m","[About how much is it to] downtown?","시내까지 대략 얼마 나오나요?",""],
-["m","[Could you pull over] here?","여기서 세워 주시겠어요?","pull over: 차를 길가에 세우다"],
-["m","[Keep the change].","잔돈은 가지세요.",""]]},
+["t","Where to?","어디로 가세요?","운전사가 가장 흔하게 쓰는 두 단어"],
+["m","[The Marriott on] Fifth, please.","5번가 메리어트요.","on + 거리 이름",[["This address, please.","휴대폰을 보여 주며"],["Could you take me to Central Station?",""]]],
+["m","[Roughly how long] to the airport?","공항까지 대략 얼마나 걸려요?","roughly: 대략",[["How's traffic right now?","교통 상황"],["Can we make it there by six?","6시까지 갈 수 있나요"]]],
+["m","[Can I pay by card]?","카드로 낼 수 있어요?","",[["Do you take cards?","짧게"],["Is it metered?","미터기 요금인지"]]],
+["m","[Could you go via] the bridge? [It's quicker].","다리 쪽으로 가 주시겠어요? 그게 더 빨라요.","via: ~을 거쳐",[["Could you take the highway?","고속도로"]]],
+["m","[Just here is fine].","여기서 내려 주시면 돼요.","pull over 보다 더 자주 쓰는 말",[["Could you pull over right here?",""],["Anywhere here is good.",""]]],
+["m","[Keep the change].","잔돈은 가지세요.","",[["Could you make it twenty?","20달러로 맞춰 주세요(팁 포함)"],["Could I get a receipt?","영수증"]]],
+["t","Your Uber's arriving. Confirm the plate and the driver's name.","우버가 도착 중입니다. 번호판과 기사 이름을 확인하세요.","plate: 번호판"]]},
 {t:"지하철·버스",e:"Subway & bus",c:"MTR",p:"MOVE",s:[
-["m","[Which line goes to] the museum?","박물관에 가려면 몇 호선을 타야 하나요?",""],
-["m","[Where can I buy] a ticket?","표는 어디서 사나요?",""],
-["m","[Does this bus go to] Central Station?","이 버스 중앙역에 가나요?",""],
-["m","[Which stop do I get off at] for the market?","시장에 가려면 어느 정류장에서 내리나요?","get off: 내리다 / get on: 타다"],
-["m","[Can I pay with] a contactless card?","컨택리스(비접촉) 카드로 탈 수 있나요?",""],
-["t","You need to transfer at the next station.","다음 역에서 갈아타셔야 해요.",""]]},
+["m","[Which line] do I take [for] the museum?","박물관 가려면 몇 호선 타요?","",[["What's the best way to get to the museum?",""],["Is it easier by bus or subway?","버스 vs 지하철"]]],
+["m","[Where do I] top up [my card]?","교통카드는 어디서 충전해요?","top up: 충전하다 / tap in: 찍고 들어가다",[["Can I just tap my credit card?","신용카드 태그"],["Do I need a ticket or can I pay on the bus?",""]]],
+["m","[Does this one go to] Central Station?","이거 중앙역 가요?","",[["Is this the right platform for downtown?","승강장 확인"],["Which direction is Brooklyn?","방향"]]],
+["t","You'll want to change at Union Square.","유니언 스퀘어에서 갈아타셔야 해요.","You'll want to ~: 부드러운 '~하셔야 해요'"],
+["m","[Could you let me know when] we get to the market?","시장에 도착하면 좀 알려 주시겠어요?","버스 기사에게",[["Is the market the next stop?","다음 정류장인지"],["How many stops is it?","몇 정거장"]]],
+["t","Mind the gap. This train terminates at Stratford.","발 빠짐 주의. 이 열차는 스트랫퍼드 종착입니다.","런던 지하철 안내 방송"],
+["m","[I think I got on the wrong one].","잘못 탄 것 같아요.","",[["Did I miss my stop?","정류장을 지나쳤는지"],["Is this heading uptown?","뉴욕: uptown / downtown"]]],
+["m","[Sorry, is this seat free]?","죄송한데 이 자리 비었나요?","",[["Is anyone sitting here?",""],["Would you like to sit down?","자리 양보"]]]]},
 {t:"기차표",e:"Trains",c:"RLY",p:"MOVE",s:[
-["m","[A round-trip ticket to] Oxford, please.","옥스퍼드 왕복표 한 장 주세요.","편도는 one-way"],
-["m","[When's the next train to] Oxford?","옥스퍼드행 다음 기차는 언제예요?",""],
-["m","[Which platform does it leave from]?","몇 번 승강장에서 출발하나요?",""],
-["t","Do you have a seat reservation?","좌석 예약하셨어요?",""],
-["m","[Is this seat taken]?","이 자리 주인 있나요?","빈자리에 앉기 전에"],
-["m","[Do I need to change trains]?","기차를 갈아타야 하나요?",""]]},
+["m","[A return to] Oxford, please. [Coming back] tonight.","옥스퍼드 왕복표요. 오늘 밤에 돌아와요.","return(영) = round-trip(미) / single(영) = one-way(미)",[["Two round-trip tickets to Boston, please.","미국식"],["Just a single, thanks.","편도"]]],
+["t","Off-peak or anytime?","오프피크로 드릴까요, 아무 때나 탈 수 있는 걸로 드릴까요?","영국 기차의 요금 종류"],
+["m","[What's the next train to] Oxford, [and which platform]?","옥스퍼드행 다음 기차는 언제고 몇 번 승강장이에요?","",[["Is this the fast train or the stopping one?","급행 vs 완행"],["Does it go direct?","직행"]]],
+["t","Platform 4, leaving in six minutes. It's direct.","4번 승강장, 6분 뒤 출발이고 직행입니다.",""],
+["m","[Is this seat taken]?","이 자리 누가 앉나요?","",[["Is anyone sitting here?",""],["Sorry, I think this is my seat.","예약석일 때"]]],
+["m","[Do I need to] reserve a seat?","좌석 예약해야 하나요?","",[["Is this the quiet carriage?","영국 기차의 조용한 칸"],["Which car is first class?","car(미) = carriage(영)"]]],
+["t","Tickets, please. Could I see your railcard as well?","표 보여 주세요. 레일카드도 같이 보여 주시겠어요?","railcard: 영국 철도 할인 카드"],
+["m","[Sorry, I think I'm on the wrong train].","죄송한데 기차를 잘못 탄 것 같아요.","",[["Can I use this ticket on the next one?","다음 기차에 사용 가능"],["I missed my train. Is this ticket still valid?","표 유효"]]]]},
 {t:"렌터카",e:"Car rental",c:"CAR",p:"MOVE",s:[
-["m","[I'm here to pick up] my rental car.","예약한 렌터카를 찾으러 왔어요.",""],
-["m","[Is insurance included]?","보험이 포함되어 있나요?",""],
-["t","Would you like full coverage?","완전 보장 보험으로 하시겠어요?","full coverage: 종합 보험"],
-["m","[Do I need to return it with] a full tank?","기름을 가득 채워서 반납해야 하나요?",""],
-["m","[There's already a scratch] here.","여기 이미 긁힌 자국이 있어요.","출발 전에 사진과 함께 확인해 두세요"],
-["m","[Where's the nearest] gas station?","가장 가까운 주유소가 어디예요?","영국에서는 petrol station"]]},
+["m","Hi, [I've got a reservation] for a compact. [Name's] Kim.","소형차 예약했어요. 이름은 김이에요.","compact: 소형차 / sedan / SUV",[["I'm picking up a car. Booked online.","온라인 예약"]]],
+["t","Would you like to add the collision damage waiver?","자차 손해 면책 보험을 추가하시겠어요?","CDW: 자차 손해 면책"],
+["m","[I'm covered by] my credit card, [so no thanks].","신용카드에 보험이 있어서 괜찮아요.","",[["Let's go with full coverage, just in case.","혹시 모르니 종합 보험"],["What's the excess on that?","면책금(영) / deductible(미)"]]],
+["m","[Do I bring it back] full?","기름 가득 채워서 반납해요?","",[["Is it full-to-full?","가득-가득 정책"],["Can I prepay the fuel?","선불 주유"]]],
+["m","[There's already a scratch] here. [Can we] note that down?","여기 이미 긁힌 자국이 있는데 기록해 둘 수 있을까요?","출발 전 사진 필수",[["Let me take a few photos first.","사진 먼저"]]],
+["t","Any additional drivers? And would you like a GPS?","추가 운전자 있으세요? 내비게이션도 필요하세요?","GPS(미) = sat nav(영)"],
+["m","[Where's the nearest] gas station?","가장 가까운 주유소가 어디예요?","gas station(미) / petrol station(영)",[["Which pump is regular?","일반 휘발유 펌프"],["Does this take diesel?","경유 여부"]]],
+["m","[Where do I drop it off]? [Is there] an after-hours key box?","반납은 어디에 해요? 영업시간 외 키 반납함 있나요?","drop off: 반납하다"]]},
 {t:"길 묻기",e:"Asking directions",c:"MAP",p:"MOVE",s:[
-["m","[Excuse me, how do I get to] City Hall?","실례합니다. 시청에 어떻게 가나요?",""],
-["m","[Is it within walking distance]?","걸어갈 수 있는 거리인가요?",""],
-["t","Go straight and turn left at the second light.","쭉 가다가 두 번째 신호등에서 왼쪽으로 도세요.",""],
-["m","[Could you show me] on the map?","지도에서 보여 주시겠어요?",""],
-["t","It's about a ten-minute walk.","걸어서 10분쯤 걸려요.",""],
-["m","[I think I'm lost].","길을 잃은 것 같아요.",""]]},
+["m","[Sorry, could you point me toward] City Hall?","죄송한데 시청 쪽이 어디인지 알려 주시겠어요?","point me toward: 방향을 알려 주다",[["Excuse me, how do I get to City Hall?","기본형"],["Am I going the right way for the station?","방향 확인"]]],
+["m","[Is it walkable], [or should I] grab a cab?","걸어갈 만해요, 아니면 택시 타야 해요?","walkable: 걸어갈 만한",[["How far is it on foot?","도보 거리"]]],
+["t","Keep going straight, then hang a left at the lights. You can't miss it.","쭉 가다가 신호등에서 왼쪽으로 꺾으세요. 바로 보일 거예요.","hang a left: 좌회전(구어) / You can't miss it: 찾기 쉬워요"],
+["t","It's a good fifteen minutes. Honestly, I'd just hop on the bus.","넉넉히 15분은 걸려요. 솔직히 저라면 버스 탈 것 같아요.","a good 15 minutes: 넉넉히 15분 / hop on: 타다"],
+["m","[Could you show me] on my phone?","제 휴대폰에서 보여 주시겠어요?","",[["What's it near?","근처 랜드마크"],["Is there a landmark I should look for?",""]]],
+["m","[I'm a bit lost]. [I'm trying to get to] this address.","길을 좀 잃었어요. 이 주소로 가려고 하는데요.","",[["I'm looking for this place.",""],["Is this the right street?",""]]],
+["t","You've actually gone past it. It's back that way, on your right.","지나치셨네요. 저쪽으로 돌아가면 오른편에 있어요.","go past: 지나치다"],
+["m","[Got it], thanks a lot!","알겠어요, 정말 감사해요!","Got it: 이해했어요",[["Cheers, mate!","영국·호주식"],["Perfect, thanks so much.",""]]]]},
 {t:"식당 예약·입장",e:"Reservations",c:"RSV",p:"FOOD",s:[
-["m","[I'd like to book a table for] two at 7 p.m.","저녁 7시에 두 명 예약하고 싶어요.","book a table: 식당을 예약하다"],
+["m","Hi, [I'd like to book a table for] two [at] seven tonight.","오늘 저녁 7시에 두 명 예약하고 싶어요.","",[["Do you have anything around seven for two?","시간대 유연하게"],["Can I get on the waitlist?","대기 명단"]]],
 ["t","Do you have a reservation?","예약하셨어요?",""],
-["m","[Do you have a table for] four?","네 명 앉을 자리 있나요?",""],
-["t","It'll be about a twenty-minute wait.","20분 정도 기다리셔야 해요.",""],
-["m","[Could we sit] by the window?","창가 자리에 앉을 수 있을까요?",""],
-["m","[Can we sit] outside?","바깥 자리에 앉아도 되나요?",""]]},
+["m","[No, just walked in]. [Table for] four?","아뇨, 그냥 왔어요. 네 명 자리 있나요?","walk-in: 예약 없이 온 손님",[["We don't, is there a wait?","대기가 있는지"],["Just the two of us.","두 명이요"]]],
+["t","It'll be about twenty minutes. Can I grab a name and number?","20분 정도 걸려요. 성함과 전화번호 알려 주시겠어요?","grab a name: 이름을 받다(구어)"],
+["m","[Could we get something] by the window [if possible]?","가능하면 창가 자리로 될까요?","",[["Can we sit outside?","바깥 자리"],["Is the patio open?","테라스"]]],
+["t","Right this way. Can I start you off with something to drink?","이쪽으로 오세요. 음료부터 드릴까요?","start you off with: 우선 ~부터"],
+["m","[Just water for now], thanks. [Still is fine].","일단 물만 주세요. 그냥 물이면 돼요.","still(생수) / sparkling(탄산수) / tap water(수돗물, 무료)",[["Could we get some tap water?","수돗물(무료)"],["Can we see the wine list?","와인 리스트"]]],
+["m","[We're not quite ready], [could you give us a minute]?","아직 못 정했어요. 잠깐만 시간 주시겠어요?","",[["We need a couple more minutes.",""]]]]},
 {t:"주문하기",e:"Ordering",c:"ORD",p:"FOOD",s:[
-["m","[Could we see the menu], please?","메뉴판 좀 볼 수 있을까요?",""],
-["m","[What do you recommend]?","추천해 주실 만한 메뉴가 있나요?",""],
-["t","How would you like your steak?","스테이크 굽기는 어떻게 해 드릴까요?",""],
-["m","[I'll have] the steak, medium-rare.","스테이크로 할게요. 미디엄 레어로요.",""],
-["m","[Is this] spicy?","이거 매운가요?",""],
-["m","[Could I get it without] onions?","양파는 빼 주실 수 있나요?","without ~: ~ 빼고"]]},
+["m","[What's good here]?","여기 뭐가 맛있어요?","추천을 묻는 가장 자연스러운 말",[["What do you recommend?",""],["What's the house specialty?","대표 메뉴"],["What are people loving lately?","요즘 인기"]]],
+["t","Are you ready to order, or do you need a few more minutes?","주문하시겠어요, 아니면 조금 더 보시겠어요?",""],
+["m","[I'll have] the steak, medium-rare, [with] fries.","스테이크 미디엄 레어로 하고 감자튀김 곁들여 주세요.","fries(미) = chips(영)",[["I'll do the salmon.","I'll do ~: 미국 캐주얼"],["Can I get the burger, no onions?","양파 빼고"]]],
+["t","How would you like that cooked?","굽기는 어떻게 해 드릴까요?","rare → medium-rare → medium → medium-well → well-done"],
+["m","[Is this] spicy? [I can't do] very spicy.","이거 매워요? 많이 매운 건 못 먹어요.","I can't do ~: ~은 못 먹어요",[["Does this have nuts in it?","견과류 알레르기"],["Is there any pork in that?","돼지고기 여부"]]],
+["m","[Could I get that without] cilantro?","고수 빼고 주실 수 있나요?","cilantro(미) = coriander(영)",[["Can I swap the fries for a salad?","사이드 교체"],["Dressing on the side, please.","드레싱 따로"]]],
+["t","Anything else I can get you?","더 필요한 거 있으세요?",""],
+["m","[I think that's it for now], thanks.","일단 그 정도면 됐어요, 감사해요.","",[["That'll do us, thanks.","영국식"],["We're good for now.","미국식"]]]]},
 {t:"식사 중 요청",e:"During the meal",c:"TBL",p:"FOOD",s:[
-["t","How is everything?","식사는 괜찮으세요?",""],
-["m","[Everything is great], thank you.","다 맛있어요. 감사합니다.",""],
-["m","[Could we get] some more bread?","빵 좀 더 주실 수 있나요?",""],
-["m","[I don't think this is] what I ordered.","제가 주문한 게 아닌 것 같아요.","I don't think ~: 부드럽게 지적하기"],
-["m","[Could I get] a box for this?","남은 건 포장해 갈 수 있을까요?","box: 남은 음식 포장 용기"],
-["m","[Could you warm this up]? It's a bit cold.","이것 좀 데워 주시겠어요? 조금 식었어요.",""]]},
+["t","How's everything tasting?","음식은 괜찮으세요?","미국 서버가 중간에 꼭 물어보는 말"],
+["m","[Really good], thanks.","정말 맛있어요, 감사해요.","",[["Everything's great.",""],["Could we get a bit more bread?","빵 추가"]]],
+["m","[Sorry, I don't think this is] what I ordered.","죄송한데 제가 시킨 게 아닌 것 같아요.","",[["I ordered the chicken, not the fish.","구체적으로"],["We're still waiting on one dish.","한 접시가 아직"]]],
+["m","[This is a bit cold]. [Could you warm it up]?","이거 좀 식었는데 데워 주실 수 있나요?","",[["This is undercooked, I'm afraid.","덜 익음"],["Could I get a fresh one?","새것으로"]]],
+["t","I'm so sorry about that. Let me take care of it.","정말 죄송해요. 바로 처리해 드릴게요.","take care of it: 처리하다"],
+["m","[Could we get a box for] this?","이거 포장해 갈 수 있을까요?","미국은 남은 음식 포장이 당연한 문화",[["Can I get this to go?","to go = 포장"],["Could you wrap this up?",""]]],
+["m","[Sorry, where's] the restroom?","죄송한데 화장실이 어디예요?","restroom(미) / toilet·loo(영) / washroom(캐나다)",[["Which way to the loo?","영국식"]]],
+["m","[Could we get the check] when you get a chance?","시간 될 때 계산서 주시겠어요?","check(미) = bill(영)",[["Could we get the bill, please?","영국식"],["We're ready whenever you are.","계산 준비됨"]]]]},
 {t:"계산·팁",e:"Paying the bill",c:"PAY",p:"FOOD",s:[
-["m","[Could we get the check], please?","계산서 주시겠어요?","영국에서는 the bill"],
-["m","[Can we pay separately]?","따로 계산할 수 있나요?",""],
-["m","[Is service included]?","봉사료가 포함되어 있나요?",""],
-["t","Would you like to add a tip?","팁을 추가하시겠어요?",""],
-["m","[I'll pay by] card.","카드로 계산할게요.","현금은 in cash"],
-["m","[I think I was charged] twice.","결제가 두 번 된 것 같아요.",""]]},
+["m","[Can we split it]?","따로 계산할 수 있어요?","split: 나누다",[["Separate checks, please.","미국식"],["Can we do half and half on two cards?","카드 두 장 반반"]]],
+["t","Would you like to add gratuity? There's a suggested amount on the bottom.","팁을 추가하시겠어요? 아래쪽에 권장 금액이 있습니다.","gratuity = tip / 미국은 15~20%가 보통"],
+["m","[Is service included]?","봉사료가 포함돼 있나요?","영국은 12.5% service charge가 붙기도 해요",[["Is the tip already on here?",""],["Is this amount with tax?","세금 포함"]]],
+["m","[I'll put it on] the card.","카드로 할게요.","",[["Cash is fine.","현금"],["Do you take Apple Pay?","간편 결제"]]],
+["t","Just tap when you're ready. Would you like a receipt?","준비되시면 태그해 주세요. 영수증 드릴까요?",""],
+["m","[I think we were charged twice] [for the] drinks.","음료가 두 번 계산된 것 같아요.","",[["This doesn't match what we ordered.","주문과 다름"],["Could you run through this with me?","같이 확인"]]],
+["m","[Keep the change]. [That was lovely].","잔돈은 괜찮아요. 정말 맛있었어요.","",[["That's for you.","팁을 건네며"],["Thanks, it was great.",""]]],
+["t","Thanks so much, you guys have a good night.","감사합니다, 좋은 밤 보내세요.","you guys: 여러 명을 부르는 미국 구어"]]},
 {t:"카페",e:"Café",c:"CAF",p:"FOOD",s:[
-["m","[Can I get] a large iced Americano?","아이스 아메리카노 큰 사이즈로 주세요.",""],
-["t","For here or to go?","드시고 가세요, 가져가세요?",""],
-["m","[To go], please.","가져갈게요.","매장에서 먹으면 For here"],
-["m","[Could I have] oat milk instead?","우유 대신 귀리 우유로 바꿀 수 있나요?","instead: 대신에"],
-["t","Can I get a name for the order?","주문하시는 분 성함이 어떻게 되세요?",""],
-["m","[Where's the restroom]?","화장실이 어디예요?","영국에서는 toilet"]]},
+["t","Hi, what can I get for you?","안녕하세요, 뭐 드릴까요?","주문 받을 때 가장 흔한 말"],
+["m","[Can I get] a large iced latte [with] oat milk?","귀리 우유 넣은 아이스 라떼 큰 거 주세요.","Can I get ~: 카페 주문의 표준",[["I'll have a flat white, please.","호주·영국식 메뉴"],["Just a black coffee, medium.","블랙커피 중간"]]],
+["t","For here or to go?","드시고 가세요, 가져가세요?","영국: Eat in or take away?"],
+["m","[To go], please.","가져갈게요.","",[["For here, thanks.","매장"],["Take away, please.","영국식"]]],
+["t","Can I get a name for that?","주문자 성함 알려 주시겠어요?",""],
+["m","[It's] Roc. R-O-C.","록이요. R, O, C.","이름은 철자까지 말하면 확실해요",[["Just put 'Kim'.","간단히"]]],
+["m","[Could I get] a splash of milk [and] one sugar?","우유 조금이랑 설탕 하나 넣어 주세요.","a splash of: 조금",[["Half-sweet, please.","덜 달게"],["Extra hot, please.","아주 뜨겁게"]]],
+["m","[Do you have] a restroom [I could use]?","화장실 쓸 수 있을까요?","",[["What's the Wi-Fi password?",""],["Is there an outlet I can use?","콘센트: outlet(미) / plug socket(영)"]]]]},
 {t:"쇼핑",e:"Shopping",c:"SHP",p:"TOUR",s:[
-["t","Can I help you find anything?","찾으시는 거 있으면 도와드릴까요?",""],
-["m","[I'm just looking], thanks.","그냥 둘러보는 중이에요. 감사합니다.",""],
-["m","[Do you have this in] a medium?","이거 미디엄 사이즈 있나요?","Do you have this in + 사이즈/색"],
-["m","[Can I try this on]?","이거 입어 봐도 되나요?","try on: 입어(신어) 보다"],
-["m","[Do you have it in] another color?","다른 색상도 있나요?",""],
-["m","[It's a little] too tight.","조금 꽉 끼네요.","너무 크면 too loose"]]},
+["t","Hi there, are you finding everything okay?","안녕하세요, 찾으시는 건 잘 찾고 계세요?","미국 매장 직원의 전형적인 인사"],
+["m","[Just browsing], thanks.","그냥 구경 중이에요, 감사해요.","",[["I'm good, thanks.",""],["Actually, could you help me find a jacket?","도움 요청"]]],
+["m","[Do you have this in] a medium?","이거 미디엄 있나요?","",[["Do you have this in any other colors?","다른 색"],["Is this the only size you've got?","사이즈 하나뿐인지"]]],
+["m","[Can I try this on]? [Where are the] fitting rooms?","입어 봐도 돼요? 탈의실이 어디예요?","fitting room(미) / changing room(영)",[["Could I try these two?","두 벌"]]],
+["t","How'd those work out for you?","입어 보니 어떠세요?","work out: (옷이) 맞다, 괜찮다"],
+["m","[A bit snug]. [Do you have the next size up]?","조금 끼네요. 한 사이즈 큰 거 있어요?","snug: 꽉 끼는 / roomy: 넉넉한",[["It's a little big, do you have a size down?","작은 사이즈"],["I'll take it.","살게요"]]],
+["m","[Is this on sale]?","이거 세일 중이에요?","",[["Is there a discount if I get two?","두 개 할인"],["Does that price include tax?","세금 포함(미국은 보통 미포함)"]]],
+["t","Can I ring you up over here?","이쪽에서 계산해 드릴까요?","ring up: 계산하다"]]},
 {t:"결제·면세·환불",e:"Paying & returns",c:"RFD",p:"TOUR",s:[
-["m","[How much is] this?","이거 얼마예요?",""],
-["m","[Is there a discount if I] buy two?","두 개 사면 할인되나요?",""],
-["m","[Could I get] a tax refund form?","택스 리펀드 서류 받을 수 있을까요?",""],
-["m","[I'd like to return] this.","이거 반품하고 싶어요.",""],
-["t","Do you have the receipt?","영수증 가지고 계세요?",""],
-["m","[Could I exchange this for] a larger size?","더 큰 사이즈로 교환할 수 있을까요?","exchange A for B: A를 B로 교환"]]},
+["m","[How much is this]?","이거 얼마예요?","",[["What's the price on this?",""],["Is that the best you can do?","흥정"]]],
+["m","[Can I get] the tax-free form [for this]?","이거 면세 서류 받을 수 있나요?","tax-free / VAT refund / tax refund",[["Do you do VAT refunds?","영국·EU"],["Do I need my passport for that?",""]]],
+["t","Debit or credit? And would you like a bag?","체크카드예요, 신용카드예요? 봉투 드릴까요?","유료 봉투가 많아요"],
+["m","[I'd like to return] this. [I've got the receipt].","이거 반품하려고요. 영수증 있어요.","",[["This doesn't fit. Can I exchange it?","교환"],["It was faulty when I opened it.","불량"]]],
+["t","What's the reason for the return?","반품 사유가 어떻게 되세요?",""],
+["m","[It didn't fit]. [Can I] exchange it for a large?","안 맞아서요. 라지로 교환할 수 있나요?","",[["I just changed my mind.","마음이 바뀜"],["Could I get a refund instead?","환불"]]],
+["t","We can do store credit, but not a refund without the receipt.","영수증이 없으면 환불은 안 되고 매장 적립금으로 해 드릴 수 있어요.","store credit: 매장 적립금"],
+["m","[Could you ship it to] my hotel?","호텔로 배송해 주실 수 있나요?","",[["Can you hold this for me till tomorrow?","내일까지 보관"],["Do you ship to Korea?","한국 배송"]]]]},
 {t:"관광지·입장권",e:"Tickets & sights",c:"TKT",p:"TOUR",s:[
-["m","[Two adult tickets], please.","성인 두 장 주세요.",""],
-["m","[What time do you close]?","몇 시에 문을 닫나요?",""],
-["m","[Do you have] an audio guide in Korean?","한국어 오디오 가이드 있나요?",""],
-["t","Large bags must be left at the cloakroom.","큰 가방은 물품 보관소에 맡기셔야 합니다.","cloakroom: 짐·외투 보관소"],
-["m","[Am I allowed to take pictures] inside?","안에서 사진 찍어도 되나요?","Am I allowed to ~?: ~해도 되나요?"],
-["m","[Is there a discount for] seniors?","경로 우대 할인이 있나요?",""]]},
+["m","[Two adults], please. [Do you do] a senior rate?","성인 두 장이요. 경로 할인 있나요?","senior rate(미) / concession(영)",[["Is there a family ticket?","가족권"],["Do you have a combo ticket with the tower?","통합권"]]],
+["t","Do you have a timed entry? It's reservation-only today.","시간 지정 입장권 있으세요? 오늘은 예약제예요.","timed entry: 시간 지정 입장"],
+["m","[I booked online]. [Here's] the QR code.","온라인으로 예약했어요. 여기 QR 코드요.","",[["Can I buy tickets here or only online?",""],["Is there a line for pre-booked tickets?","예매 줄"]]],
+["m","[What time do you close], [and when's last entry]?","몇 시에 닫아요? 마지막 입장은 언제예요?","",[["How long do people usually spend here?","평균 관람 시간"]]],
+["t","Large bags need to go in the cloakroom. Photos are fine, no flash.","큰 가방은 물품 보관소에 맡기셔야 해요. 사진은 괜찮은데 플래시는 안 돼요.","cloakroom: 짐·외투 보관소"],
+["m","[Is there] an audio guide in Korean?","한국어 오디오 가이드 있나요?","",[["Do you have a map in Korean?","한국어 지도"],["Is there a guided tour today?","가이드 투어"]]],
+["m","[Can I get back in] if I step out for lunch?","점심 먹으러 나갔다가 다시 들어올 수 있나요?","re-entry: 재입장",[["Is this ticket good all day?","종일 유효"]]],
+["t","Keep your wristband on and you're good to go.","손목 밴드를 차고 계시면 됩니다.","you're good to go: 다 됐어요, 가셔도 돼요"]]},
 {t:"투어·사진 부탁",e:"Tours & photos",c:"TUR",p:"TOUR",s:[
-["m","[Could you take a picture of] us?","저희 사진 좀 찍어 주시겠어요?",""],
-["m","[Just press] this button.","이 버튼만 누르시면 돼요.",""],
-["m","[Could you take] one more?","한 장만 더 찍어 주시겠어요?",""],
-["m","[Where does the tour start]?","투어는 어디서 시작하나요?",""],
-["m","[How long is] the tour?","투어는 얼마나 걸리나요?",""],
-["t","Please be back here by three.","3시까지 여기로 돌아와 주세요.","by + 시각: ~까지"]]},
+["m","[Would you mind taking a picture of] us?","저희 사진 좀 찍어 주시겠어요?","",[["Could you get one with the bridge in the back?","배경 포함"],["Want me to take one of you guys?","찍어 드릴까요"]]],
+["m","[Just tap] here. [Maybe a couple], just in case.","여기만 누르시면 돼요. 혹시 모르니 두어 장요.","just in case: 혹시 몰라서",[["Can you do a vertical one too?","세로 사진"]]],
+["t","Say cheese! Want to check it?","치즈! 한번 확인해 보실래요?",""],
+["m","[That's perfect], thank you so much!","완벽해요, 정말 감사합니다!","",[["Could we do one more?","한 장 더"]]],
+["m","[Where does the tour kick off], [and how long is it]?","투어는 어디서 시작하고 얼마나 걸려요?","kick off: 시작하다",[["Is it a walking tour?","도보 투어"],["Does it stop for lunch?","점심 포함"]]],
+["t","Meet back here at three sharp. The bus won't wait.","3시 정각에 여기로 모이세요. 버스는 기다리지 않아요.","three sharp: 3시 정각"],
+["m","[Is there a bathroom stop] along the way?","가는 길에 화장실 들르나요?","",[["How much walking is involved?","도보량"],["Can I leave the group early?","중간 이탈"]]],
+["m","[That was fantastic], [thanks for the tour].","정말 좋았어요. 투어 감사합니다.","",[["You were brilliant.","영국식 칭찬"],["Is it okay to tip?","팁 가능 여부"]]]]},
 {t:"환전·유심",e:"Money & phone",c:"EXC",p:"TOUR",s:[
-["m","[I'd like to exchange] won for euros.","원화를 유로로 바꾸고 싶어요.",""],
-["m","[What's the exchange rate] today?","오늘 환율이 어떻게 되나요?",""],
-["m","[Is there an ATM] near here?","근처에 ATM 있나요?",""],
-["t","Would you like to pay in euros or Korean won?","유로로 결제하시겠어요, 원화로 하시겠어요?","해외 카드 결제는 보통 현지 통화 선택이 유리해요"],
-["m","[I'd like a SIM card with] data for a week.","일주일 쓸 데이터 유심 주세요.",""],
-["m","[My phone won't connect] to the network.","휴대폰이 네트워크에 연결되지 않아요.","won't + 동사: 도무지 ~하지 않는다"]]},
+["m","[I'd like to change] 500,000 won [into] euros.","50만 원을 유로로 바꾸고 싶어요.","",[["What's your rate for Korean won?","환율"],["Any commission on that?","수수료"]]],
+["m","[Could I get] some smaller bills?","작은 단위 지폐로 좀 주실 수 있나요?","bills(미) = notes(영) / change: 동전·잔돈",[["Can you break a hundred?","100달러를 잔돈으로"]]],
+["m","[Is there] an ATM [around here]?","근처에 ATM 있어요?","영국: cash machine, cashpoint",[["Does this ATM charge a fee?","수수료"],["Where's the nearest cash machine?","영국식"]]],
+["t","Would you like to be charged in euros or in Korean won?","유로로 결제할까요, 원화로 할까요?","현지 통화(euros)를 고르는 게 보통 유리해요"],
+["m","[In euros], please.","유로로요.","",[["Local currency, please.","현지 통화로"]]],
+["m","[I need] a SIM [with] data [for] two weeks.","2주 쓸 데이터 유심이 필요해요.","",[["Do you do eSIMs?","eSIM"],["What's the cheapest plan with unlimited data?","무제한 요금제"]]],
+["t","Pop your passport on the counter and I'll set it up for you.","여권을 카운터에 올려 주시면 제가 설정해 드릴게요.","pop: 놓다(영국 구어)"],
+["m","[It's not picking up] a signal.","신호를 못 잡아요.","pick up a signal: 신호를 잡다",[["My data's not working.",""],["Could you check the APN settings?","APN 설정"]]]]},
 {t:"약국·병원",e:"Pharmacy & clinic",c:"MED",p:"HELP",s:[
-["m","[I have a] headache.","머리가 아파요.","I have a + 증상"],
-["m","[Do you have anything for] a cold?","감기약 있나요?",""],
-["t","How long have you had these symptoms?","이 증상은 언제부터 있었어요?",""],
-["m","[I'm allergic to] penicillin.","페니실린 알레르기가 있어요.",""],
-["m","[How often should I take] this?","이 약은 얼마나 자주 먹어야 하나요?",""],
-["m","[I need to see a doctor].","진료를 받아야 할 것 같아요.",""]]},
+["m","[I've got a] splitting headache. [What do you have for] that?","머리가 깨질 듯이 아파요. 뭐가 좋을까요?","splitting headache: 심한 두통",[["I think I'm coming down with a cold.","감기 기운"],["My stomach's been off since last night.","배탈"]]],
+["t","Any allergies? Are you on any other medication?","알레르기 있으세요? 복용 중인 약은요?","be on medication: 약을 복용 중이다"],
+["m","[I'm allergic to] penicillin. [Nothing else].","페니실린 알레르기가 있어요. 다른 건 없어요.","",[["No allergies that I know of.","알기로는 없음"]]],
+["m","[How often do I take] these?","이거 얼마나 자주 먹어요?","",[["With food or on an empty stomach?","식후 / 공복"],["Will this make me drowsy?","졸림 여부"]]],
+["t","One every six hours, and don't take more than four a day.","6시간마다 한 알, 하루 네 알 넘기지 마세요.",""],
+["m","[I need to see a doctor]. [Is there] a walk-in clinic [nearby]?","진료를 받아야겠어요. 근처에 예약 없이 가는 병원 있나요?","walk-in clinic / urgent care(미)",[["Where's the nearest A&E?","응급실: A&E(영) / ER(미)"]]],
+["t","Do you have travel insurance? We'll need the details.","여행자 보험 있으세요? 정보가 필요해요.",""],
+["m","[Could I get] an itemized receipt [for the insurance]?","보험 청구용으로 항목별 영수증 받을 수 있을까요?","",[["Could you write down the diagnosis in English?","진단명 영문으로"]]]]},
 {t:"분실·도난",e:"Lost & stolen",c:"LST",p:"HELP",s:[
-["m","[I lost my] passport.","여권을 잃어버렸어요.",""],
-["m","[My wallet was stolen].","지갑을 도난당했어요.",""],
+["m","[I've lost my] passport.","여권을 잃어버렸어요.","",[["I can't find my wallet anywhere.",""],["I think I left my phone in the cab.","택시에 두고 내림"]]],
+["m","[My wallet got stolen] on the subway.","지하철에서 지갑을 도난당했어요.","get stolen: 도난당하다",[["Someone pickpocketed me.","소매치기"],["My bag was snatched.","날치기"]]],
 ["t","When did you last have it?","마지막으로 갖고 계셨던 게 언제예요?",""],
-["m","[Where's the nearest] police station?","가장 가까운 경찰서가 어디예요?",""],
-["m","[I need a police report] for my insurance.","보험 청구용 경찰 확인서가 필요해요.","police report: 사건 신고 확인서"],
-["m","[I left my bag] in the taxi.","택시에 가방을 두고 내렸어요.","leave A in B: A를 B에 두고 오다"]]},
+["m","[About an hour ago], [near] the station.","한 시간쯤 전에, 역 근처에서요.","",[["Sometime this morning, I'm not sure exactly.","정확하지 않을 때"]]],
+["m","[I need to file a police report] [for] my insurance.","보험 때문에 경찰 신고서가 필요해요.","file a report: 신고하다",[["Where's the nearest police station?",""],["Can I do the report online?","온라인 신고"]]],
+["t","Fill this out and we'll give you a crime reference number.","이걸 작성하시면 사건 접수 번호를 드릴게요.","crime reference number: 영국 경찰 접수 번호"],
+["m","[I need to cancel my cards]. [Can I use] your phone?","카드를 정지해야 해요. 전화 좀 쓸 수 있을까요?","",[["Could you help me call my bank?",""]]],
+["m","[Did anyone hand in] a black wallet?","혹시 검은 지갑 맡겨진 거 있나요?","hand in: 맡기다 / lost and found: 분실물 센터",[["Is there a lost and found?",""],["Lost property office, is it this way?","영국식 lost property"]]]]},
 {t:"긴급 상황",e:"Emergencies",c:"SOS",p:"HELP",s:[
-["m","[Please call] an ambulance!","구급차 불러 주세요!",""],
-["m","[I need help]!","도와주세요!",""],
-["t","Are you hurt?","다치셨어요?",""],
-["m","[I've been in] a car accident.","교통사고가 났어요.",""],
-["m","[Does anyone here speak] Korean?","여기 한국어 하시는 분 계신가요?",""],
-["m","[Please contact] the Korean Embassy.","한국 대사관에 연락해 주세요.","외교부 영사콜센터 +82-2-3210-0404"]]},
+["m","[Call an ambulance]! [Someone's collapsed]!","구급차 불러 주세요! 사람이 쓰러졌어요!","911(미) / 999(영) / 112(EU)",[["We need a doctor, quick!",""],["Is anyone here a doctor?","의사 찾기"]]],
+["m","[I need help]. [I don't feel well].","도와주세요. 몸이 안 좋아요.","",[["I'm feeling really dizzy.","어지러움"],["I can't breathe properly.","호흡 곤란"]]],
+["t","What's your emergency? Where are you right now?","무슨 응급 상황인가요? 지금 어디 계세요?","911 교환원이 묻는 말"],
+["m","[There's been an accident] [on] Main Street. [Two people are hurt].","메인 스트리트에서 사고가 났어요. 두 명이 다쳤어요.","",[["I've been in a car accident.","본인 사고"],["A car hit a cyclist.","자전거 사고"]]],
+["t","Stay on the line. Is the person breathing?","끊지 마세요. 그분 숨은 쉬고 있나요?","stay on the line: 전화를 끊지 않다"],
+["m","[Does anyone here speak] Korean?","여기 한국어 하시는 분 계세요?","",[["Could you speak slowly? My English isn't great.",""]]],
+["m","[Please contact] the Korean Embassy. [Here's the] number.","한국 대사관에 연락해 주세요. 여기 번호요.","영사콜센터 +82-2-3210-0404"],
+["m","[I'm okay], [just shaken up].","괜찮아요, 그냥 좀 놀랐어요.","shaken up: 충격을 받은",[["I'm fine, really.",""],["I'd like to go to the hospital just to be safe.","혹시 몰라 병원"]]]]},
 {t:"스몰토크",e:"Small talk",c:"HEY",p:"TALK",s:[
-["t","Where are you from?","어디서 오셨어요?",""],
-["m","[I'm from] Seoul, South Korea.","한국 서울에서 왔어요.",""],
-["m","[This is my first time] in Spain.","스페인은 이번이 처음이에요.",""],
-["t","How do you like it so far?","지금까지 여기 어떠세요?",""],
-["m","[I love it]. The food is amazing.","정말 좋아요. 음식이 최고예요.",""],
-["m","[Any recommendations for] dinner around here?","이 근처에 저녁 먹을 만한 곳 추천해 주실래요?","Any recommendations for ~?: 짧고 편한 질문"]]},
+["t","So where are you from?","그래서 어디서 오셨어요?","So로 시작하면 대화가 부드러워요"],
+["m","[Seoul], [originally], [but I'm here for] about a week.","서울에서 왔고, 일주일쯤 있을 거예요.","",[["Korea. South, just to be clear!","농담 섞어"],["Seoul. Have you been?","되묻기"]]],
+["t","Oh nice! How are you liking it so far?","오 좋네요! 지금까지 어떠세요?","How are you liking ~?: 소감 묻기"],
+["m","[Loving it]. [The food's] unreal.","너무 좋아요. 음식이 끝내줘요.","unreal: 끝내주는(구어)",[["It's been great, just a bit jet-lagged.","시차 피곤"],["Honestly, the weather's been a bit rough.","날씨가 안 좋을 때"]]],
+["m","[Any recommendations for] dinner around here?","이 근처 저녁 먹을 데 추천해 주실래요?","",[["What do locals do on a Saturday night?","현지인 추천"],["What should I absolutely not miss?","꼭 가야 할 곳"]]],
+["t","What do you do back home?","본국에서는 무슨 일 하세요?","직업 묻는 말"],
+["m","[I run] a logistics tech company. [We make] parcel machines for the post office.","물류 기술 회사를 운영해요. 우체국용 소포 기계를 만들어요.","run a company: 회사를 운영하다",[["I'm in logistics automation.","I'm in + 분야"],["I'm semi-retired, taking it easy.","반은퇴"]]],
+["m","[Nice chatting with you].","얘기 즐거웠어요.","",[["It was great meeting you.",""],["Enjoy the rest of your trip!","여행 잘 하세요"]]]]},
 {t:"되묻기·감사·작별",e:"Clarify & goodbye",c:"BYE",p:"TALK",s:[
-["m","[Sorry, could you say that again]?","죄송한데 다시 한번 말씀해 주시겠어요?",""],
-["m","[Could you speak a little more slowly]?","조금만 천천히 말씀해 주시겠어요?",""],
-["m","[Could you write it down] for me?","적어 주실 수 있을까요?",""],
-["m","[Thank you so much for] your help.","도와주셔서 정말 감사합니다.",""],
-["m","[It was nice meeting you].","만나서 반가웠어요.",""],
-["m","[Have a great] trip!","즐거운 여행 되세요!","Have a great day / weekend / trip"]]}
+["m","[Sorry, I didn't catch that].","죄송한데 못 알아들었어요.","catch: 알아듣다",[["Sorry, could you say that again?",""],["Come again?","아주 캐주얼"]]],
+["m","[Could you slow down a bit]? [My English is] so-so.","조금만 천천히 말씀해 주실래요? 영어가 그저 그래요.","",[["Could you say that in a different way?","다른 말로"],["Could you spell that for me?","철자"]]],
+["m","[What do you mean by] 'brunch'?","'브런치'가 무슨 뜻이에요?","What do you mean by ~?: 단어 뜻 확인",[["How do you say this in English?","물건을 가리키며"]]],
+["t","No worries at all. Take your time.","전혀 괜찮아요. 천천히 하세요.","No worries: 괜찮아요(호주·영국·미국 모두 흔함)"],
+["m","[Thanks a bunch] [for all your help].","도와주셔서 정말 고마워요.","Thanks a bunch: 정말 고마워요(구어)",[["I really appreciate it.",""],["Cheers!","영국·호주: 고마워요 겸 안녕"],["You've been so helpful.",""]]],
+["t","My pleasure. Have a good one!","별말씀을요. 좋은 하루 보내세요!","Have a good one: 안녕히 가세요(미국 구어)"],
+["m","[It was lovely meeting you]. [Safe travels]!","만나서 반가웠어요. 안전한 여행 되세요!","",[["Take care!","잘 지내요"],["Keep in touch.","연락해요"]]],
+["m","[Have a great] weekend!","즐거운 주말 보내세요!","",[["Have a good flight!","비행 잘 하세요"],["Catch you later.","또 봐요(캐주얼)"]]]]}
 ];
-
 const ALL=[];
-D.forEach((d,i)=>d.s.forEach((s,j)=>ALL.push({id:(i+1)+"-"+(j+1),day:i+1,n:j+1,role:s[0],en:s[1],ko:s[2],tip:s[3]||""})));
+D.forEach((d,i)=>d.s.forEach((s,j)=>ALL.push({id:(i+1)+"-"+(j+1),day:i+1,n:j+1,role:s[0],en:s[1],ko:s[2],tip:s[3]||"",alts:s[4]||[]})));
 const BY={}; ALL.forEach(s=>{BY[s.id]=s;});
 
 /* ───────── 상태 ───────── */
-const DEF_SET={rate:1,gap:"normal",order:"ko",slow:true,shuffle:false,loop:true,hide:false,range:"today"};
+const DEF_SET={rate:1,gap:"normal",order:"ko",slow:true,alts:true,shuffle:false,loop:true,hide:false,range:"today"};
 const LS="travel-english-30.v1";
 function norm(o){
   o=(o&&typeof o==="object")?o:{};
@@ -582,6 +652,12 @@ function speak(text,lang,rate){
     try{speechSynthesis.resume();speechSynthesis.speak(u);}catch(e){done();}
   });
 }
+function sayText(btn,text,rate){
+  if(!TTS.ok){toast("이 기기에서는 음성 읽기를 지원하지 않아요.");return;}
+  document.querySelectorAll(".playing").forEach(b=>b.classList.remove("playing"));
+  stopSpeech(); btn.classList.add("playing");
+  speak(text,"en",rate||1).then(()=>btn.classList.remove("playing"));
+}
 function sayOne(btn,id,rate){
   const s=BY[id]; if(!s)return;
   if(!TTS.ok){toast("이 기기에서는 음성 읽기를 지원하지 않아요.");return;}
@@ -611,6 +687,7 @@ function drawCar(){
   const ko=$("#carKo"), en=$("#carEn");
   ko.textContent=showKo?s.ko:"· · ·"; ko.classList.toggle("veil",!showKo);
   en.innerHTML=showEn?hl(s.en):"· · ·"; en.classList.toggle("veil",!showEn);
+  if(!P.playing)$("#carAlt").textContent="";
   const pb=$("#carPlay");
   pb.innerHTML=P.playing?ICON.pauseL+"<span>일시정지</span>":ICON.playL+"<span>재생</span>";
   pb.setAttribute("aria-label",P.playing?"일시정지":"재생");
@@ -633,10 +710,14 @@ async function playSentence(s,tok){
     steps.push(["ko",1,"한국어 뜻"],["wait",Math.round(1500*mul),"영어로 떠올려 보세요"],["en",r,"영어 듣기"],["wait",rep,"따라 말해 보세요"]);
     if(S.set.slow)steps.push(["en",r*.8,"천천히 한 번 더"],["wait",Math.round(rep*.7),"따라 말해 보세요"]);
   }
+  if(S.set.alts&&s.alts.length){
+    s.alts.forEach(a=>{steps.push(["alt",a[0],"이렇게도 말해요"],["wait",Math.round(600*mul),""]);});
+  }
   steps.push(["wait",800,""]);
   for(const st of steps){
     if(tok!==P.token)return;
     if(st[0]==="wait"){if(st[2])setStage(st[2],st[1]);await sleep(st[1]);}
+    else if(st[0]==="alt"){P.show.ko=true;P.show.en=true;drawCar();$("#carAlt").textContent=st[1];setStage(st[2],0);await speak(st[1],"en",r);}
     else{
       P.show[st[0]]=true; drawCar(); setStage(st[2],0);
       await speak(st[0]==="ko"?s.ko:en,st[0],st[1]);
@@ -711,6 +792,7 @@ function card(s,o){
     '<p class="ko">'+esc(s.ko)+'</p>'+
     (hide?'<button class="reveal" data-reveal="'+s.id+'">눌러서 영어 확인</button>':'<p class="en" lang="en">'+hl(s.en)+'</p>')+
     (s.tip?'<p class="tip"><span class="lbl">Tip</span>'+esc(s.tip)+'</p>':'')+
+    (s.alts.length&&!hide?'<div class="alts"><span class="lbl">이렇게도 말해요</span>'+s.alts.map(a=>'<button class="alt" data-text="'+esc(a[0])+'" aria-label="듣기">'+ICON.play+'<span class="alt-en" lang="en">'+esc(a[0])+'</span>'+(a[1]?'<span class="alt-note">'+esc(a[1])+'</span>':'')+'</button>').join('')+'</div>':'')+
     '<div class="sent-act"><button class="btn sm" data-say="'+s.id+'" data-rate="1">'+ICON.play+'듣기</button>'+
     '<button class="btn sm ghost" data-say="'+s.id+'" data-rate="0.72">천천히</button>'+
     (o.showDay?'<button class="btn sm ghost dayref" data-go="'+s.day+'">DAY '+pad(s.day)+' '+esc(D[s.day-1].t)+'</button>':'')+
@@ -739,7 +821,7 @@ function rToday(){
         '<div class="pass-head"><span class="dnum">'+pad(sel)+'</span><span class="zone">'+esc(PH[d.p])+'</span></div>'+
         '<h2 class="pass-title">'+esc(d.t)+'</h2>'+
         '<p class="pass-sub" lang="en">'+esc(d.e)+'</p>'+
-        '<p class="pass-sub">문장 6개 · 그중 '+them+'개는 현지에서 듣게 될 말</p>'+
+        '<p class="pass-sub">문장 '+d.s.length+'개 · 그중 '+them+'개는 현지에서 듣게 될 말</p>'+
         '<div class="pass-actions"><button class="btn primary" data-act="drive-today">'+ICON.play+'연속 듣기</button></div>'+
       '</div>'+
       '<div class="pass-stub"><span class="lbl">Gate</span><span class="gate">'+d.c+'</span><span class="lbl">Status</span>'+status+'</div>'+
@@ -760,7 +842,7 @@ function rDrive(){
   const R=[["today","오늘의 DAY "+pad(sel),D[sel-1].t],["done","완료한 DAY 복습",Object.keys(S.done).length+"일 분량"],["favs","즐겨찾기","저장한 문장"],["all","30일 전체","모든 상황"]];
   const tg=(k,l)=>'<label class="tg" for="tg-'+k+'"><span>'+l+'</span><input type="checkbox" class="sw" id="tg-'+k+'" data-tg="'+k+'"'+(S.set[k]?" checked":"")+'></label>';
   return '<header class="top"><p class="eyebrow">Drive mode</p><h1>차에서 듣기</h1>'+
-    '<p class="lede">화면을 보지 않아도 되도록 한국어 뜻을 먼저 읽고, 영어로 떠올릴 시간을 준 뒤 영어 문장을 들려줍니다. 문장마다 따라 말할 시간도 둡니다.</p></header>'+
+    '<p class="lede">화면을 보지 않아도 되도록 한국어 뜻을 먼저 읽고, 영어로 떠올릴 시간을 준 뒤 영어 문장을 들려줍니다. 문장마다 따라 말할 시간을 두고, 현지에서 쓰는 다른 표현도 이어서 들려줍니다.</p></header>'+
     (TTS.ok?'':'<p class="warn">이 브라우저는 음성 읽기를 지원하지 않습니다. Chrome이나 삼성 인터넷 최신 버전에서 열어 주세요.</p>')+
     '<div class="group"><p class="glabel">무엇을 들을까요</p><div class="ranges">'+
       R.map(x=>'<button class="range" data-range="'+x[0]+'" aria-pressed="'+(x[0]===range)+'"'+(c[x[0]]?"":" disabled")+'><b>'+esc(x[1])+'</b><small>'+esc(x[2])+' · '+c[x[0]]+'문장</small></button>').join("")+
@@ -768,7 +850,7 @@ function rDrive(){
     seg("order","듣는 순서",[["ko","한국어 뜻 → 영어"],["en","영어만"]])+
     seg("rate","영어 속도",[["0.85","천천히"],["1","보통"],["1.1","조금 빠르게"]])+
     seg("gap","따라 말할 시간",[["short","짧게"],["normal","보통"],["long","넉넉히"]])+
-    '<div class="group"><div class="toggles">'+tg("slow","영어를 천천히 한 번 더 듣기")+tg("shuffle","순서 섞기")+tg("loop","끝나면 처음부터 다시 듣기")+'</div></div>'+
+    '<div class="group"><div class="toggles">'+tg("slow","영어를 천천히 한 번 더 듣기")+tg("alts","다른 표현(이렇게도 말해요)도 듣기")+tg("shuffle","순서 섞기")+tg("loop","끝나면 처음부터 다시 듣기")+'</div></div>'+
     '<div class="start"><button class="btn primary wide big" data-act="start-drive" data-range="'+range+'">'+ICON.play+'드라이브 모드 시작</button></div>'+
     '<ul class="notes"><li>출발 전에 재생을 시작하고, 운전 중에는 화면을 조작하지 마세요.</li>'+
     '<li>휴대폰을 차량 블루투스에 연결하면 차 스피커로 들을 수 있어요.</li>'+
@@ -796,7 +878,7 @@ function drawResults(){
   const r=$("#results"), b=$("#board"); if(!r||!b)return;
   const q=query.trim().toLowerCase();
   if(!q){r.hidden=true;b.hidden=false;r.innerHTML="";return;}
-  const hits=ALL.filter(s=>s.ko.toLowerCase().indexOf(q)>=0||plain(s.en).toLowerCase().indexOf(q)>=0||s.tip.toLowerCase().indexOf(q)>=0||D[s.day-1].t.indexOf(q)>=0);
+  const hits=ALL.filter(s=>s.ko.toLowerCase().indexOf(q)>=0||plain(s.en).toLowerCase().indexOf(q)>=0||s.tip.toLowerCase().indexOf(q)>=0||D[s.day-1].t.indexOf(q)>=0||s.alts.some(a=>(a[0]+' '+a[1]).toLowerCase().indexOf(q)>=0));
   const shown=hits.slice(0,40);
   r.hidden=false; b.hidden=true;
   r.innerHTML=shown.length?'<p class="count">'+hits.length+'개 문장'+(hits.length>40?' 중 40개 표시':'')+'</p><ol class="sents">'+shown.map(s=>card(s,{showDay:true,noHide:true})).join("")+'</ol>'
@@ -847,6 +929,7 @@ document.addEventListener("click",e=>{
   if(ds.tab){setTab(ds.tab);return;}
   if(ds.fav){toggleFav(ds.fav);return;}
   if(ds.say){sayOne(b,ds.say,+ds.rate||1);return;}
+  if(ds.text){sayText(b,ds.text,1);return;}
   if(ds.reveal){revealed.add(ds.reveal);render();return;}
   if(ds.go){const n=+ds.go;if(n>=1&&n<=30){sel=n;selTouched=true;setTab("today");}return;}
   if(ds.set){let v=ds.val;if(ds.set==="rate")v=+v;S.set[ds.set]=v;commit();render();return;}

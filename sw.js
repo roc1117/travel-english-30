@@ -1,5 +1,5 @@
 /* 여행영어 30일 — 오프라인 캐시 */
-const VERSION = "te30-v1";
+const VERSION = "te30-v2";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/maskable-512.png", "./icons/icon-180.png"];
 const FONT_CACHE = "te30-fonts";
